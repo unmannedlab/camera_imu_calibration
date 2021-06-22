@@ -54,7 +54,8 @@ add_library(camimucalib_lib SHARED
             src/state/StateHelper.cpp
             src/state/Propagator.cpp
             src/track/cameraTracking.cpp
-            src/update/UpdaterCameraTracking.cpp)
+            src/update/UpdaterCameraTracking.cpp
+            src/core/camimucalibManager.cpp)
 
 target_link_libraries(camimucalib_lib ${thirdparty_libraries})
 target_include_directories(camimucalib_lib PUBLIC src)

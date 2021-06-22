@@ -90,7 +90,7 @@ namespace camimucalib_estimator {
             printf("checkerboard_dy: %0.4f", checkerboard_dy);
             printf("checkerboard_rows: %d", checkerboard_rows);
             printf("checkerboard_cols: %d", checkerboard_cols);
-            printf("camera_calibration_file_path: %s", camera_calibration_file_path);
+            printf("camera_calibration_file_path: %s", camera_calibration_file_path.c_str());
         }
 
         /// CSV file as output

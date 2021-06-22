@@ -11,14 +11,13 @@
 #include <Eigen/StdVector>
 #include <boost/filesystem.hpp>
 
-#include "track/cameraTracking.h"
-
 #include "init/InertialInitializer.h"
 
 #include "state/State.h"
 #include "state/StateHelper.h"
 #include "state/Propagator.h"
 #include "update/UpdaterCameraTracking.h"
+#include "track/cameraTracking.h"
 
 #include "camimucalibManagerOptions.h"
 
@@ -27,17 +26,17 @@ namespace camimucalib_estimator {
     class camimucalibManager {
     public:
         /// Constructor that will load all configuration variables
-        camimucalibManager(lincalibManagerOptions& param_);
+        camimucalibManager(camimucalibManagerOptions& param_);
 
         /// Feed function for inertial data
         void feed_measurement_imu(double timestamp, Eigen::Vector3d wm, Eigen::Vector3d am);
 
-        /// Feed function for lidar data
-        void feed_measurement_lidar(double timestamp, pcl::PointCloud<lin_core::PointXYZIR8Y>::Ptr cloud_in);
+        /// Feed function for camera data
+        void feed_measurement_camera(double timestamp, cv::Mat image_in);
 
         /// If we initialized or not
         bool initialized() {
-            return is_initialized_linkalibr;
+            return is_initialized_camimucalib;
         }
 
         /// Timestamp the system was initialized at
@@ -55,10 +54,10 @@ namespace camimucalib_estimator {
             return propagator;
         }
 
-        /// Accessor to Lidar Odometry object
-        LidarOdometry::Ptr get_track_lodom() {
-            return LOdom;
-        }
+//        /// Accessor to Camera Odometry object
+//        camimucalib_core::cameraTracking::Ptr get_track_lodom() {
+//            return cameraPoseTracker;
+//        }
 
         /// Returns the last timestamp we have marginalized (true if we have a state)
         bool hist_last_marg_state(double &timestamp, Eigen::Matrix<double,7,1> &stateinG) {
@@ -82,11 +81,6 @@ namespace camimucalib_estimator {
 
         /// G_T_I1;
         Eigen::Matrix4d G_T_I1 = Eigen::Matrix4d::Identity();
-
-        /// Get the time stamp of the first scan (used for building map)
-        double get_map_time() {
-            return map_time;
-        }
 
         /// Print State for debugging
         void printState();
@@ -115,9 +109,8 @@ namespace camimucalib_estimator {
         /// HEC Updater
         UpdaterCameraTracking* updaterCameraTracking;
 
-        /// Pose Odometry object (Tracker)
-        camimucalib_::LidarOdometry::Ptr LOdom;
-//        LidarOdometry LOdom;
+        /// Camera Pose object (Tracker)
+//        camimucalib_core::cameraTracking::Ptr cameraPoseTracker;
 
         /// Track the distance travelled
         double timelastupdate = -1;
@@ -135,10 +128,6 @@ namespace camimucalib_estimator {
         std::ofstream velocity_csv;
         std::ofstream calib_extrinsic_csv;
         std::ofstream calib_dt_csv;
-
-        /// For Surfel Association
-        double map_time;
-        bool first_propagation = true;
 
         /// Update flags
         bool did_update1 = false, did_update2 = false;

@@ -52,9 +52,9 @@ camimucalib_estimator::camimucalibManager::camimucalibManager(camimucalib_estima
     updaterCameraTracking = new UpdaterCameraTracking(params.updaterOptions);
 
     /// Initialize the Camera Pose Object
-//    cameraPoseTracker = std::make_shared<camimucalib_core::cameraTracking>(params.checkerboard_dx, params.checkerboard_dy,
-//                                                                           params.checkerboard_rows, params.checkerboard_cols,
-//                                                                           params.camera_calibration_file_path);
+    cameraPoseTracker = std::make_shared<camimucalib_core::cameraTracking>(params.checkerboard_dx, params.checkerboard_dy,
+                                                                           params.checkerboard_rows, params.checkerboard_cols,
+                                                                           params.camera_calibration_file_path);
 }
 
 bool camimucalib_estimator::camimucalibManager::try_to_initialize() {
@@ -107,21 +107,21 @@ void camimucalib_estimator::camimucalibManager::feed_measurement_camera(double t
             return;
     }
 
-//    cameraPoseTracker->feedImage(timestamp, image_in);
-//
-//    do_propagate_update(timestamp);
-//
-//    if(state->_clones_IMU.size() == 1) {
-//        /// G_T_I1
-//        Eigen::Matrix<double, 4, 1> q_GtoI1 = state->_imu->quat();
-//        Eigen::Matrix3d I1_R_G = camimucalib_core::quat_2_Rot(q_GtoI1);
-//        Eigen::Matrix3d G_R_I1 = I1_R_G.transpose();
-//        Eigen::Vector3d G_t_I1 = state->_imu->pos();
-//        G_T_I1.block(0, 0, 3, 3) = G_R_I1;
-//        G_T_I1.block(0, 3, 3, 1) = G_t_I1;
-//    }
-//    /// Printing for debug
-//    printState();
+    cameraPoseTracker->feedImage(timestamp, image_in);
+
+    do_propagate_update(timestamp);
+
+    if(state->_clones_IMU.size() == 1) {
+        /// G_T_I1
+        Eigen::Matrix<double, 4, 1> q_GtoI1 = state->_imu->quat();
+        Eigen::Matrix3d I1_R_G = camimucalib_core::quat_2_Rot(q_GtoI1);
+        Eigen::Matrix3d G_R_I1 = I1_R_G.transpose();
+        Eigen::Vector3d G_t_I1 = state->_imu->pos();
+        G_T_I1.block(0, 0, 3, 3) = G_R_I1;
+        G_T_I1.block(0, 3, 3, 1) = G_t_I1;
+    }
+    /// Printing for debug
+    printState();
 }
 
 void camimucalib_estimator::camimucalibManager::do_propagate_update(double timestamp) {
@@ -129,4 +129,61 @@ void camimucalib_estimator::camimucalibManager::do_propagate_update(double times
         printf(YELLOW "Stepping back in time!!! (prop dt = %3f)\n" RESET, (timestamp-state->_timestamp));
         return;
     }
+}
+
+void camimucalib_estimator::camimucalibManager::printState() {
+//    std::cout << YELLOW << "Started Printing" << std::endl;
+    Pose* calib = state->_calib_CAMERAtoIMU;
+
+    Eigen::Matrix3d I_R_G = camimucalib_core::quat_2_Rot(state->_imu->quat());
+    Eigen::Vector3d G_euler_I = (I_R_G.transpose()).eulerAngles(0, 1, 2);
+    double roll = atan2(sin(G_euler_I.x()), cos(G_euler_I.x()))*180/M_PI;
+    double pitch = atan2(sin(G_euler_I.y()), cos(G_euler_I.y()))*180/M_PI;
+    double yaw = atan2(sin(G_euler_I.z()), cos(G_euler_I.z()))*180/M_PI;
+
+    /// 1
+    std::vector<Type*> statevars_pose;
+    statevars_pose.push_back(state->_imu->pose());
+    Eigen::Matrix<double, 6, 6> covariance_imu_pose = StateHelper::get_marginal_covariance(state, statevars_pose);
+    trajfile_csv << state->_imu->quat().x() << ", " << state->_imu->quat().y() << ", "
+                 << state->_imu->quat().z() << ", " << state->_imu->quat().w() << ", "
+                 << state->_imu->pos().x() << ", " << state->_imu->pos().y() << ", "
+                 << state->_imu->pos().z() << ", " << state->_imu->vel().x() << ", "
+                 << state->_imu->vel().y() << ", " << state->_imu->vel().z() << std::endl;
+
+    /// 2
+    std::vector<Type*> statevars_bias_a;
+    statevars_bias_a.push_back(state->_imu->ba());
+    Eigen::Matrix<double, 3, 3> covariance_imu_ba = StateHelper::get_marginal_covariance(state, statevars_bias_a);
+    std::vector<Type*> statevars_bias_g;
+    statevars_bias_g.push_back(state->_imu->bg());
+    Eigen::Matrix<double, 3, 3> covariance_imu_bg = StateHelper::get_marginal_covariance(state, statevars_bias_g);
+    bias_csv << state->_imu->bias_a().x() << ", " << state->_imu->bias_a().y() << ", " << state->_imu->bias_a().z() << ", "
+             << state->_imu->bias_g().x() << ", " << state->_imu->bias_g().y() << ", " << state->_imu->bias_g().z() << ", "
+             << sqrt(covariance_imu_ba(0, 0)) << ", " << sqrt(covariance_imu_ba(1, 1)) << ", " << sqrt(covariance_imu_ba(2, 2)) << ", "
+             << sqrt(covariance_imu_bg(0, 0)) << ", " << sqrt(covariance_imu_bg(1, 1)) << ", " << sqrt(covariance_imu_bg(2, 2)) << std::endl;
+
+    /// 3
+    std::vector<Type*> statevars_velocity;
+    statevars_velocity.push_back(state->_imu->v());
+    Eigen::Matrix<double, 3, 3> covariance_imu_velocity = StateHelper::get_marginal_covariance(state, statevars_velocity);
+    velocity_csv << state->_imu->vel().x() << ", " << state->_imu->vel().y() << ", " << state->_imu->vel().z() << ", "
+                 << sqrt(covariance_imu_velocity(0, 0)) << ", "<< sqrt(covariance_imu_velocity(1, 1)) << ", "<< sqrt(covariance_imu_velocity(2, 2)) << std::endl;
+
+    /// 4
+    std::vector<Type*> statevars_calib_extrinsic;
+    statevars_calib_extrinsic.push_back(state->_calib_CAMERAtoIMU);
+    Eigen::Matrix<double, 6, 6> covariance_calib_extrinsic = StateHelper::get_marginal_covariance(state, statevars_calib_extrinsic);
+    calib_extrinsic_csv << calib->quat()(0) << "," << calib->quat()(1) << ", " << calib->quat()(2) << ", " << calib->quat()(3) << ", "
+                        << calib->pos()(0) << "," << calib->pos()(1) << "," << calib->pos()(2) << ", "
+                        << sqrt(covariance_calib_extrinsic(0, 0)) << ", " << sqrt(covariance_calib_extrinsic(1, 1)) << ", " << sqrt(covariance_calib_extrinsic(2, 2)) << ", "
+                        << sqrt(covariance_calib_extrinsic(3, 3)) << ", " << sqrt(covariance_calib_extrinsic(4, 4)) << ", " << sqrt(covariance_calib_extrinsic(5, 5)) << std::endl;
+
+    /// 5
+    std::vector<Type*> statevars_calib_dt;
+    statevars_calib_dt.push_back(state->_calib_dt_CAMERAtoIMU);
+    Eigen::Matrix<double, 1, 1> covariance_calib_dt = StateHelper::get_marginal_covariance(state, statevars_calib_dt);
+    calib_dt_csv << state->_calib_dt_CAMERAtoIMU->value()(0) << ", " << sqrt(covariance_calib_dt(0, 0)) << std::endl;
+//    std::cout << GREEN << "Time Delay: " << 1000*state->_calib_dt_LIDARtoIMU->value()(0) << " [ms]" << std::endl;
+//    std::cout << YELLOW << "Done Printing" << std::endl;
 }

@@ -19,18 +19,21 @@
 #include <opencv2/core/eigen.hpp>
 
 #include <fstream>
+#include <memory>
 
 namespace camimucalib_core {
     class cameraTracking {
     public:
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+        typedef std::shared_ptr<cameraTracking> Ptr;
         struct Odom {
             double timestamp;
             Eigen::Matrix4d pose;
         };
-        cameraTracking(int dx_, int dy_,
-                       double checkerboard_rows_,
-                       double checkerboard_cols_,
-                       std::string cam_config_file_path_);
+        explicit  cameraTracking(int dx_ = 0.05, int dy_ = 0.05,
+                       double checkerboard_rows_ = 6,
+                       double checkerboard_cols_ = 7,
+                       std::string cam_config_file_path_ = "");
         void readCameraParams(std::string cam_config_file_path,
                               int &image_height, int &image_width,
                               cv::Mat &D, cv::Mat &K);

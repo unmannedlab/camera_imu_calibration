@@ -54,10 +54,10 @@ namespace camimucalib_estimator {
             return propagator;
         }
 
-//        /// Accessor to Camera Odometry object
-//        camimucalib_core::cameraTracking::Ptr get_track_lodom() {
-//            return cameraPoseTracker;
-//        }
+        /// Accessor to Camera Odometry object
+        camimucalib_core::cameraTracking::Ptr get_track_lodom() {
+            return cameraPoseTracker;
+        }
 
         /// Returns the last timestamp we have marginalized (true if we have a state)
         bool hist_last_marg_state(double &timestamp, Eigen::Matrix<double,7,1> &stateinG) {
@@ -110,7 +110,7 @@ namespace camimucalib_estimator {
         UpdaterCameraTracking* updaterCameraTracking;
 
         /// Camera Pose object (Tracker)
-//        camimucalib_core::cameraTracking::Ptr cameraPoseTracker;
+        camimucalib_core::cameraTracking::Ptr cameraPoseTracker;
 
         /// Track the distance travelled
         double timelastupdate = -1;

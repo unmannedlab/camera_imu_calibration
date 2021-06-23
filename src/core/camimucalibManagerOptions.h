@@ -63,7 +63,7 @@ namespace camimucalib_estimator {
         // Time offset between camera and IMU
         double calib_camimu_dt = 0.0;
 
-        // Camera IMU extrinsics (q_LtoI, p_LinI). Note the
+        //  IMU extrinsics (q_LtoI, p_LinI). Note the
         // difference between "to" and "in"
         Eigen::Matrix<double, 7, 1> cam_imu_extrinsics;
 
@@ -90,7 +90,7 @@ namespace camimucalib_estimator {
             printf("checkerboard_dy: %0.4f", checkerboard_dy);
             printf("checkerboard_rows: %d", checkerboard_rows);
             printf("checkerboard_cols: %d", checkerboard_cols);
-            printf("camera_calibration_file_path: %s", camera_calibration_file_path.c_str());
+            printf("camera_calibration_file_path: %s", camera_calibration_file_path);
         }
 
         /// CSV file as output

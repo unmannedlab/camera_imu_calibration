@@ -129,6 +129,27 @@ void camimucalib_estimator::camimucalibManager::do_propagate_update(double times
         printf(YELLOW "Stepping back in time!!! (prop dt = %3f)\n" RESET, (timestamp-state->_timestamp));
         return;
     }
+    /// Propagate the state forward to the current update time
+    /// Also augment it with a clone!
+    propagator->propagate_and_clone(state, timestamp);
+    /// Return if we are unable to propagate
+    if (state->_timestamp != timestamp) {
+        printf(RED "[PROP]: Propagator unable to propagate the state forward in time!\n" RESET);
+        printf(RED "[PROP]: It has been %.3f since last time we propagated\n" RESET,timestamp-state->_timestamp);
+        return;
+    }
+    if(state->_clones_IMU.size() < 2) {
+        printf(YELLOW "[camimucalib_estimator::camimucalibManager::do_propagate_update] state->_clones_IMU.size() must be > 2\n");
+        return;
+    }
+    /// Marginalize the oldest clone if needed
+    if(did_update1 && did_update2) {
+        StateHelper::marginalize_old_clone(state);
+    }
+    relativePose rP = cameraPoseTracker->getRelativePose();
+    updaterCameraTracking->updateImage2Image(state, rP, did_update1);
+    Eigen::Matrix4d Im1_T_Imk = cameraPoseTracker->getCameraPose().pose;
+    updaterCameraTracking->updateImage2FirstImage(state, Im1_T_Imk, G_T_I1, timestamp, did_update2);
 }
 
 void camimucalib_estimator::camimucalibManager::printState() {

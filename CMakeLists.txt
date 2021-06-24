@@ -63,8 +63,8 @@ target_include_directories(camimucalib_lib PUBLIC src)
 ##################################################
 # Adding different executables
 ##################################################
-#add_executable(ros_test_node src/ros_linkalibr_test.cpp)
-#target_link_libraries(ros_test_node linkalibr_lib ${catkin_LIBRARIES})
+add_executable(ros_test_node src/ros_camimucalib_test.cpp)
+target_link_libraries(ros_test_node camimucalib_lib ${catkin_LIBRARIES})
 
 
 

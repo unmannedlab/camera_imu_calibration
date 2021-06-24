@@ -34,13 +34,13 @@ camimucalib_estimator::camimucalibManager::camimucalibManager(camimucalib_estima
     /// Time offset from Camera to IMU
     Eigen::VectorXd temp_cameraimu_dt;
     temp_cameraimu_dt.resize(1);
-    temp_cameraimu_dt(0) = params.calib_camimu_dt;
+    temp_cameraimu_dt(0) = params.calib_cameraimu_dt;
     state->_calib_dt_CAMERAtoIMU->set_value(temp_cameraimu_dt);
     state->_calib_dt_CAMERAtoIMU->set_fe(temp_cameraimu_dt);
 
     /// Extrinsic Calibration
-    state->_calib_CAMERAtoIMU->set_value(params.cam_imu_extrinsics);
-    state->_calib_CAMERAtoIMU->set_fe(params.cam_imu_extrinsics);
+    state->_calib_CAMERAtoIMU->set_value(params.camera_imu_extrinsics);
+    state->_calib_CAMERAtoIMU->set_fe(params.camera_imu_extrinsics);
 
     /// Propagator
     propagator = new Propagator(params.imu_noises, params.gravity);

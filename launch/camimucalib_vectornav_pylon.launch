@@ -1,0 +1,82 @@
+<launch>
+
+    <!-- MASTER NODE! -->
+    <node name="ros_test_node" pkg="camera_imu_calibration" type="ros_test_node" output="screen" clear_params="true" required="true">
+        <!-- bag topics -->
+        <param name="topic_imu"    type="string" value="/vectornav/IMU" />
+        <param name="topic_lidar"  type="string" value="/pylon_camera_node/image_raw" />
+
+        <!-- bag parameters -->
+        <param name="path_bag"    type="string" value="/home/usl/Downloads/kalibr_calibration/Subodh_imucam_2021-06-17-19-15-37.bag" />
+
+        <param name="bag_start"   type="double" value="0.0" />
+        <param name="bag_durr"    type="int"    value="-1" />
+
+        <!-- Estimator Parameters -->
+        <param name="use_fej" type="bool" value="false" />
+        <param name="use_imuavg" type="bool" value="true" />
+        <param name="use_rk4int" type="bool" value="true" />
+        <param name="calib_lidar_timeoffset" type="bool" value="false" />
+        <param name="calib_extrinsics"   type="bool"   value="true" />
+        <param name="max_clones" type="int" value="2" />
+        <param name="updater_do_chi2_check" type="bool" value="false"/>
+
+        <!-- Filter Init Parameters -->
+        <param name="init_window_time" type="double" value="0.5"/> <!-- in second -->
+        <param name="init_imu_thresh" type="double" value="0.25"/> <!-- jerk threshold -->
+
+        <!-- Noise Parameters -->
+<!--         <param name="accelerometer_noise_density"  type="double"   value="0.00094666" /> -->
+<!--         <param name="accelerometer_random_walk"    type="double"   value="0.00278617" /> -->
+        <param name="accelerometer_noise_density"  type="double"   value="0.094666" />
+        <param name="accelerometer_random_walk"    type="double"   value="0.278617" />
+        <param name="gyroscope_noise_density"      type="double"   value="0.00006243" />
+        <param name="gyroscope_random_walk"        type="double"   value="0.00000046" />
+
+        <!-- Updater Parameters -->
+        <!-- Chi2 Parameters -->
+        <param name="updater_chi2_multiplier" type="int" value="1" />
+        <!-- Update Noise (sigma) Params -->
+        <param name="updater_rotation_noise" type="double" value="0.1" />
+        <param name="updater_translation_noise" type="double" value="0.1" />
+
+        <!-- State Initial Noise (sigma) Params -->
+        <param name="state_init_x_noise" type="double" value="0.5" />
+        <param name="state_init_y_noise" type="double" value="0.5" />
+        <param name="state_init_z_noise" type="double" value="0.5" />
+        <param name="state_init_rx_noise" type="double" value="0.1" />
+        <param name="state_init_ry_noise" type="double" value="0.1" />
+        <param name="state_init_rz_noise" type="double" value="0.1" />
+
+        <param name="state_init_timeoffset_noise" type="double" value="0.01" />
+
+        <!-- Gravity -->
+        <rosparam param="gravity">[0.0, 0.0, 9.81]</rosparam>
+
+        <!-- initialization of lidar imu time offset -->
+        <param name="calib_cameraimu_dt" type="double" value="0.0" />
+
+        <!-- initial calibration file -->
+        <param name="init_calibration_result_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/I_T_C_init.txt"/>
+
+        <!-- Camera Tracking Parameters -->
+        <param name="checkerboard_dx" type="double" value="0.05"/>
+        <param name="checkerboard_dy" type="double" value="0.05"/>
+        <param name="checkerboard_rows" type="int" value="6"/>
+        <param name="checkerboard_cols" type="int" value="7"/>
+        <param name="camera_calibration_file_path" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/pylon_calib.yaml"/>
+
+        <!-- output filenames -->
+        <param name="camimu_trajectory_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/camimucalib_trajectory.csv"/>
+        <param name="camimu_bias_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/camimucalib_bias.csv"/>
+        <param name="camimu_velocity_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/camimucalib_velocity.csv"/>
+        <param name="camimu_calib_extrinsic_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/camimu_calib_extrinsic.csv"/>
+        <param name="camimu_calib_dt_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/camimu_calib_dt.csv"/>
+        <param name="camerapose_trajectory_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/camerapose_trajectory.csv"/>
+
+        <!-- Write an output bad -->
+        <param name="calibration_result_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/I_T_C.txt"/>
+
+    </node>
+
+</launch>

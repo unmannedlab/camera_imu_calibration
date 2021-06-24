@@ -61,21 +61,19 @@ namespace camimucalib_estimator {
         Eigen::Vector3d gravity = {0.0, 0.0, 9.81};
 
         // Time offset between camera and IMU
-        double calib_camimu_dt = 0.0;
+        double calib_cameraimu_dt = 0.0;
 
         //  IMU extrinsics (q_LtoI, p_LinI). Note the
         // difference between "to" and "in"
-        Eigen::Matrix<double, 7, 1> cam_imu_extrinsics;
+        Eigen::Matrix<double, 7, 1> camera_imu_extrinsics;
 
         // This function will print out all state defaults loaded.
         void print_state() {
             printf("STATE PARAMETERS:\n");
             printf("\t- gravity: %.3f, %.3f, %.3f\n", gravity(0), gravity(1), gravity(2));
-            printf("\t- calib_camimu_dt: %.4f\n", calib_camimu_dt);
-            std::cout << "cam_imu_extrinsic(0:3):" << endl
-                << cam_imu_extrinsics.block(0,0,4,1).transpose() << std::endl;
-            std::cout << "cam_imu_extrinsic(4:6):" << endl
-                << cam_imu_extrinsics.block(4,0,3,1).transpose() << std::endl;
+            printf("\t- calib_camimu_dt: %.4f\n", calib_cameraimu_dt);
+            std::cout << "cam_imu_extrinsic(0:3):" << endl << camera_imu_extrinsics.block(0,0,4,1).transpose() << std::endl;
+            std::cout << "cam_imu_extrinsic(4:6):" << endl << camera_imu_extrinsics.block(4,0,3,1).transpose() << std::endl;
         }
 
         /// Camera Pose Tracking
@@ -90,7 +88,7 @@ namespace camimucalib_estimator {
             printf("checkerboard_dy: %0.4f", checkerboard_dy);
             printf("checkerboard_rows: %d", checkerboard_rows);
             printf("checkerboard_cols: %d", checkerboard_cols);
-            printf("camera_calibration_file_path: %s", camera_calibration_file_path);
+            printf("camera_calibration_file_path: %s", camera_calibration_file_path.c_str());
         }
 
         /// CSV file as output

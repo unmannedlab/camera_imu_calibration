@@ -12,6 +12,9 @@ namespace camimucalib_core {
         checkerboard_rows = checkerboard_rows_;
         checkerboard_cols = checkerboard_cols_;
 
+        projection_matrix = cv::Mat::zeros(3, 3, CV_64F);
+        distCoeff = cv::Mat::zeros(5, 1, CV_64F);
+
         readCameraParams(cam_config_file_path, image_height, image_width, distCoeff, projection_matrix);
 
         for(int i = 0; i < checkerboard_rows; i++)
@@ -36,6 +39,8 @@ namespace camimucalib_core {
             std::cerr << "Error: Wrong path: " << cam_config_file_path << std::endl;
         fs_cam_config["image_height"] >> image_height;
         fs_cam_config["image_width"] >> image_width;
+        std::cout << "image_height: " << image_height << std::endl;
+        std::cout << "image_width: " << image_width << std::endl;
         fs_cam_config["k1"] >> D.at<double>(0);
         fs_cam_config["k2"] >> D.at<double>(1);
         fs_cam_config["p1"] >> D.at<double>(2);
@@ -56,11 +61,12 @@ namespace camimucalib_core {
                                                             image_points,cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE +
                                                                          cv::CALIB_CB_FAST_CHECK);
         cv::drawChessboardCorners(image_in, cv::Size(checkerboard_cols, checkerboard_rows), image_points, boardDetectedInCam);
-        if(boardDetectedInCam)
+        if(boardDetectedInCam) {
             cv::cornerSubPix(image_in, image_points, cv::Size(21, 21),
                              cv::Size(-1, -1), cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
-        assert(image_points.size() == object_points.size());
-        estimateCameraPose();
+            assert(image_points.size() == object_points.size());
+            estimateCameraPose();
+        }
     }
 
     void cameraTracking::estimateCameraPose() {

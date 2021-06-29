@@ -84,11 +84,11 @@ namespace camimucalib_estimator {
         std::string camera_calibration_file_path = "/home/usl/catkin_ws/src/camera_imu_calibration/config/pylon_calib.yaml";
         void print_trackers() {
             printf("CAMERA Tracking PARAMETERS:\n");
-            printf("checkerboard_dx: %0.4f", checkerboard_dx);
-            printf("checkerboard_dy: %0.4f", checkerboard_dy);
-            printf("checkerboard_rows: %d", checkerboard_rows);
-            printf("checkerboard_cols: %d", checkerboard_cols);
-            printf("camera_calibration_file_path: %s", camera_calibration_file_path.c_str());
+            printf("checkerboard_dx: %0.4f\n", checkerboard_dx);
+            printf("checkerboard_dy: %0.4f\n", checkerboard_dy);
+            printf("checkerboard_rows: %d\n", checkerboard_rows);
+            printf("checkerboard_cols: %d\n", checkerboard_cols);
+            printf("camera_calibration_file_path: %s\n", camera_calibration_file_path.c_str());
         }
 
         /// CSV file as output

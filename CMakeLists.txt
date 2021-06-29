@@ -10,6 +10,7 @@ find_package(catkin QUIET COMPONENTS
         nav_msgs
         tf
         imuPacket
+        cv_bridge
 )
 
 # Include libraries

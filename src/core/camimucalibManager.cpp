@@ -27,7 +27,6 @@ camimucalib_estimator::camimucalibManager::camimucalibManager(camimucalib_estima
     velocity_csv.open(params.camimu_velocity_filename);
     calib_extrinsic_csv.open(params.camimu_calib_extrinsic_filename);
     calib_dt_csv.open(params.camimu_calib_dt_filename);
-
     /// Create the state
     state = new State(params.state_options);
 
@@ -50,7 +49,6 @@ camimucalib_estimator::camimucalibManager::camimucalibManager(camimucalib_estima
 
     /// Make the Updater
     updaterCameraTracking = new UpdaterCameraTracking(params.updaterOptions);
-
     /// Initialize the Camera Pose Object
     cameraPoseTracker = std::make_shared<camimucalib_core::cameraTracking>(params.checkerboard_dx, params.checkerboard_dy,
                                                                            params.checkerboard_rows, params.checkerboard_cols,
@@ -85,7 +83,6 @@ bool camimucalib_estimator::camimucalibManager::try_to_initialize() {
     state->_imu->set_fe(imu_val);
     state->_timestamp = time0;
     startup_time = time0;
-
     printState();
     return true;
 }
@@ -155,7 +152,6 @@ void camimucalib_estimator::camimucalibManager::do_propagate_update(double times
 void camimucalib_estimator::camimucalibManager::printState() {
 //    std::cout << YELLOW << "Started Printing" << std::endl;
     Pose* calib = state->_calib_CAMERAtoIMU;
-
     Eigen::Matrix3d I_R_G = camimucalib_core::quat_2_Rot(state->_imu->quat());
     Eigen::Vector3d G_euler_I = (I_R_G.transpose()).eulerAngles(0, 1, 2);
     double roll = atan2(sin(G_euler_I.x()), cos(G_euler_I.x()))*180/M_PI;
@@ -200,11 +196,15 @@ void camimucalib_estimator::camimucalibManager::printState() {
                         << sqrt(covariance_calib_extrinsic(0, 0)) << ", " << sqrt(covariance_calib_extrinsic(1, 1)) << ", " << sqrt(covariance_calib_extrinsic(2, 2)) << ", "
                         << sqrt(covariance_calib_extrinsic(3, 3)) << ", " << sqrt(covariance_calib_extrinsic(4, 4)) << ", " << sqrt(covariance_calib_extrinsic(5, 5)) << std::endl;
 
-    /// 5
-    std::vector<Type*> statevars_calib_dt;
-    statevars_calib_dt.push_back(state->_calib_dt_CAMERAtoIMU);
-    Eigen::Matrix<double, 1, 1> covariance_calib_dt = StateHelper::get_marginal_covariance(state, statevars_calib_dt);
-    calib_dt_csv << state->_calib_dt_CAMERAtoIMU->value()(0) << ", " << sqrt(covariance_calib_dt(0, 0)) << std::endl;
-//    std::cout << GREEN << "Time Delay: " << 1000*state->_calib_dt_LIDARtoIMU->value()(0) << " [ms]" << std::endl;
-//    std::cout << YELLOW << "Done Printing" << std::endl;
+//    std::cout << "Crashed here 1!" << std::endl;
+//    /// 5
+//    std::vector<Type*> statevars_calib_dt;
+//    statevars_calib_dt.push_back(state->_calib_dt_CAMERAtoIMU);
+//    std::cout << "Crashed here 2!" << std::endl;
+//    Eigen::Matrix<double, 1, 1> covariance_calib_dt = StateHelper::get_marginal_covariance(state, statevars_calib_dt);
+//    std::cout << "Crashed here 3!" << std::endl;
+//    calib_dt_csv << state->_calib_dt_CAMERAtoIMU->value()(0) << ", " << sqrt(covariance_calib_dt(0, 0)) << std::endl;
+////    std::cout << GREEN << "Time Delay: " << 1000*state->_calib_dt_LIDARtoIMU->value()(0) << " [ms]" << std::endl;
+////    std::cout << YELLOW << "Done Printing" << std::endl;
+//    std::cout << "Crashed here 5!" << std::endl;
 }

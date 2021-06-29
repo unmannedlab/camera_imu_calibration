@@ -54,7 +54,7 @@ namespace camimucalib_core {
         W_T_C_eig = Eigen::Matrix4d::Identity();
     }
 
-    void cameraTracking::feedImage(double timestamp, cv::Mat input_image, Eigen::Matrix4d pose_predict) {
+    bool cameraTracking::feedImage(double timestamp, cv::Mat input_image, Eigen::Matrix4d pose_predict) {
         current_timestamp = timestamp;
         image_in = input_image;
         bool boardDetectedInCam = cv::findChessboardCorners(image_in, cv::Size(checkerboard_cols, checkerboard_rows),
@@ -67,6 +67,7 @@ namespace camimucalib_core {
             assert(image_points.size() == object_points.size());
             estimateCameraPose();
         }
+        return boardDetectedInCam;
     }
 
     void cameraTracking::estimateCameraPose() {

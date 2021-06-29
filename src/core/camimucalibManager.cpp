@@ -104,9 +104,9 @@ void camimucalib_estimator::camimucalibManager::feed_measurement_camera(double t
             return;
     }
 
-    cameraPoseTracker->feedImage(timestamp, image_in);
+    bool boarddetected = cameraPoseTracker->feedImage(timestamp, image_in);
 
-    do_propagate_update(timestamp);
+    do_propagate_update(timestamp, boarddetected);
 
     if(state->_clones_IMU.size() == 1) {
         /// G_T_I1
@@ -121,7 +121,7 @@ void camimucalib_estimator::camimucalibManager::feed_measurement_camera(double t
     printState();
 }
 
-void camimucalib_estimator::camimucalibManager::do_propagate_update(double timestamp) {
+void camimucalib_estimator::camimucalibManager::do_propagate_update(double timestamp, bool boarddetected) {
     if(state->_timestamp >= timestamp) {
         printf(YELLOW "Stepping back in time!!! (prop dt = %3f)\n" RESET, (timestamp-state->_timestamp));
         return;
@@ -139,14 +139,17 @@ void camimucalib_estimator::camimucalibManager::do_propagate_update(double times
         printf(YELLOW "[camimucalib_estimator::camimucalibManager::do_propagate_update] state->_clones_IMU.size() must be > 2\n");
         return;
     }
-    /// Marginalize the oldest clone if needed
-    if(did_update1 && did_update2) {
-        StateHelper::marginalize_old_clone(state);
+    std::cout << "Board Detected ?: " << boarddetected << std::endl;
+    if (boarddetected) {
+        /// Marginalize the oldest clone if needed
+        if(did_update1 && did_update2) {
+            StateHelper::marginalize_old_clone(state);
+        }
+        relativePose rP = cameraPoseTracker->getRelativePose();
+        updaterCameraTracking->updateImage2Image(state, rP, did_update1);
+        Eigen::Matrix4d Im1_T_Imk = cameraPoseTracker->getCameraPose().pose;
+        updaterCameraTracking->updateImage2FirstImage(state, Im1_T_Imk, G_T_I1, timestamp, did_update2);
     }
-    relativePose rP = cameraPoseTracker->getRelativePose();
-    updaterCameraTracking->updateImage2Image(state, rP, did_update1);
-    Eigen::Matrix4d Im1_T_Imk = cameraPoseTracker->getCameraPose().pose;
-    updaterCameraTracking->updateImage2FirstImage(state, Im1_T_Imk, G_T_I1, timestamp, did_update2);
 }
 
 void camimucalib_estimator::camimucalibManager::printState() {

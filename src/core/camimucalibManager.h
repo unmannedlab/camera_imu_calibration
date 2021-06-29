@@ -89,7 +89,7 @@ namespace camimucalib_estimator {
     protected:
 
         /// This will do propagation and updates
-        void do_propagate_update(double timestamp);
+        void do_propagate_update(double timestamp, bool boarddetected);
 
         ///The following will update our historical tracking information
         void update_keyframe_historical_information();

@@ -37,7 +37,7 @@ namespace camimucalib_core {
         void readCameraParams(std::string cam_config_file_path,
                               int &image_height, int &image_width,
                               cv::Mat &D, cv::Mat &K);
-        void feedImage(double timestamp, cv::Mat input_image,
+        bool feedImage(double timestamp, cv::Mat input_image,
                        Eigen::Matrix4d pose_predict = Eigen::Matrix4d::Identity());
         void estimateCameraPose();
         Odom getCameraPose();

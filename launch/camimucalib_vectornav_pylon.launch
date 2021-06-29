@@ -26,10 +26,10 @@
         <param name="init_imu_thresh" type="double" value="0.25"/> <!-- jerk threshold -->
 
         <!-- Noise Parameters -->
-        <param name="accelerometer_noise_density"  type="double"   value="0.094666" />
-        <param name="accelerometer_random_walk"    type="double"   value="0.278617" />
-        <param name="gyroscope_noise_density"      type="double"   value="0.00006243" />
-        <param name="gyroscope_random_walk"        type="double"   value="0.00000046" />
+        <param name="accelerometer_noise_density"  type="double"   value="1.051e-02" />
+        <param name="accelerometer_random_walk"    type="double"   value="3.2e-05" />
+        <param name="gyroscope_noise_density"      type="double"   value="6.2e-02" />
+        <param name="gyroscope_random_walk"        type="double"   value="5.0e-06" />
 
         <!-- Updater Parameters -->
         <!-- Chi2 Parameters -->

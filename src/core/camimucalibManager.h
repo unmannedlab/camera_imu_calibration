@@ -128,6 +128,7 @@ namespace camimucalib_estimator {
         std::ofstream velocity_csv;
         std::ofstream calib_extrinsic_csv;
         std::ofstream calib_dt_csv;
+        std::ofstream visodom_csv;
 
         /// Update flags
         bool did_update1 = false, did_update2 = false;

@@ -81,6 +81,7 @@ int main (int argc, char** argv) {
             Eigen::Matrix<double, 3, 1> wm, am;
             wm << (*s_imu).angular_velocity.x, (*s_imu).angular_velocity.y, (*s_imu).angular_velocity.z;
             am << (*s_imu).linear_acceleration.x, (*s_imu).linear_acceleration.y, (*s_imu).linear_acceleration.z;
+//            ROS_INFO_STREAM("Feeding imu measurement");
             sys->feed_measurement_imu(time_imu, wm, am);
         }
 
@@ -88,6 +89,7 @@ int main (int argc, char** argv) {
         if (s_image != nullptr && m.getTopic() == topic_image) {
             double time_lidar = (*s_image).header.stamp.toSec();
             cv::Mat image_in = cv_bridge::toCvShare(s_image, "mono8")->image;
+//            ROS_INFO_STREAM("Feeding camera measurement");
             sys->feed_measurement_camera(time_lidar, image_in);
         }
     }

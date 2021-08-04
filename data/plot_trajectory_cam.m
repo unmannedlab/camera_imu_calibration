@@ -1,11 +1,11 @@
 clear all;
 %close all;
 clc;
-data = csvread('camimucalib_trajectory.csv');
+data = csvread('camerapose_trajectory.csv');
 quat = data(:, 1:4);
 xyz = data(:, 5:7);
 %%
-figure('Name','IMU Trajectory 3D XYZ KF','NumberTitle','off');
+figure('Name','Camera Trajectory','NumberTitle','off');
 plot3(xyz(1,1), xyz(1,2), xyz(1,3), 'ro','MarkerSize',12,'MarkerFaceColor',[1 .6 .6]);
 hold on;
 plot3(xyz(:, 1), xyz(:, 2), xyz(:, 3), 'b', 'LineWidth', 1.5);
@@ -21,7 +21,7 @@ set(gca,'FontSize', 20);
 
 
 %%
-figure('Name', 'IMU Translation X, Y, Z','NumberTitle','off')
+figure('Name', 'Camera Translation X, Y, Z','NumberTitle','off')
 subplot(311)
 plot(xyz(:,1), 'LineWidth', 3);
 hold off;
@@ -63,7 +63,7 @@ for i=1:length(quat)
     eulerangleDegrees = [eulerangleDegrees; [euler_x, euler_y, euler_z]];
 end
 
-figure('Name', 'IMU Euler X, Y, Z Angles','NumberTitle','off')
+figure('Name', 'Camera Euler X, Y, Z Angles','NumberTitle','off')
 subplot(311)
 plot(eulerangleDegrees(:,1), 'LineWidth', 3);
 hold off;

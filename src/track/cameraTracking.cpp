@@ -2,9 +2,9 @@
 
 namespace camimucalib_core {
 
-    cameraTracking::cameraTracking(int dx_, int dy_,
-                                   double checkerboard_rows_,
-                                   double checkerboard_cols_,
+    cameraTracking::cameraTracking(double dx_, double dy_,
+                                   int checkerboard_rows_,
+                                   int checkerboard_cols_,
                                    std::string cam_config_file_path_) {
         cam_config_file_path = cam_config_file_path_;
         dx = dx_;
@@ -77,6 +77,9 @@ namespace camimucalib_core {
         for(int i = 0; i < projected_points.size(); i++){
             cv::circle(image_in, projected_points[i], 3, cv::Scalar(0, 255, 0), -1, cv::LINE_AA, 0);
         }
+
+//        cv::imshow("image_in", image_in);
+//        cv::waitKey(10);
         cv::Rodrigues(rvec, C_R_W);
         cv::cv2eigen(C_R_W, C_R_W_eig);
         C_t_W_eig = Eigen::Vector3d(tvec.at<double>(0),tvec.at<double>(1),tvec.at<double>(2));

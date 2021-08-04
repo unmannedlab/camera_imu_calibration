@@ -27,6 +27,7 @@ camimucalib_estimator::camimucalibManager::camimucalibManager(camimucalib_estima
     velocity_csv.open(params.camimu_velocity_filename);
     calib_extrinsic_csv.open(params.camimu_calib_extrinsic_filename);
     calib_dt_csv.open(params.camimu_calib_dt_filename);
+    visodom_csv.open(params.camerapose_trajectory_filename);
     /// Create the state
     state = new State(params.state_options);
 
@@ -210,4 +211,16 @@ void camimucalib_estimator::camimucalibManager::printState() {
 ////    std::cout << GREEN << "Time Delay: " << 1000*state->_calib_dt_LIDARtoIMU->value()(0) << " [ms]" << std::endl;
 ////    std::cout << YELLOW << "Done Printing" << std::endl;
 //    std::cout << "Crashed here 5!" << std::endl;
+
+    /// 6
+    cameraTracking::Odom camPose = cameraPoseTracker->getCameraPose();
+    Eigen::Matrix4d C0_T_Ck = camPose.pose;
+    Eigen::Matrix3d C0_R_Ck = C0_T_Ck.block(0, 0, 3, 3);
+//    std::cout << "C0_T_Ck: \n" << std::endl;
+//    std::cout << C0_T_Ck << std::endl << std::endl;
+    Eigen::Quaterniond C0_quat_Ck(C0_R_Ck);
+    Eigen::Vector3d C0_t_Ck = C0_T_Ck.block(0, 3, 3, 1);
+    visodom_csv << C0_quat_Ck.x() << ", " << C0_quat_Ck.y() << ", " << C0_quat_Ck.z() << ", " << C0_quat_Ck.w() << ", "
+                 << C0_t_Ck.x() << ", " << C0_t_Ck.y() << ", "<< C0_t_Ck.z() << std::endl;
+
 }

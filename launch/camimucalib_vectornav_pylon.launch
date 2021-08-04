@@ -4,11 +4,11 @@
     <node name="ros_test_node" pkg="camera_imu_calibration" type="ros_test_node" output="screen" clear_params="true" required="true">
         <!-- bag topics -->
         <param name="topic_imu"    type="string" value="/vectornav/IMU" />
-        <param name="topic_image"  type="string" value="/pylon_camera_node/image_raw" />
+        <param name="topic_image"  type="string" value="pylon_camera_node/image_raw" />
 
         <!-- bag parameters -->
-        <param name="path_bag"    type="string" value="/home/usl/Downloads/kalibr_calibration/Subodh_imucam_2021-06-17-19-15-37.bag" />
-
+    <param name = "path_bag" type="string" value="/home/usl/Downloads/kalibr_calibration/Subodh_new_data_bc_hes_picky_about_speed_2021-07-01-17-04-25.bag"/>
+<!--         <param name = "path_bag" type="string" value="/home/usl/Downloads/kalibr_calibration/Subodh_new_data_bc_hes_picky_about_speed_2021-07-01-17-05-44.bag"/> -->
         <param name="bag_start"   type="double" value="0.0" />
         <param name="bag_durr"    type="int"    value="-1" />
 
@@ -26,22 +26,22 @@
         <param name="init_imu_thresh" type="double" value="0.25"/> <!-- jerk threshold -->
 
         <!-- Noise Parameters -->
-        <param name="accelerometer_noise_density"  type="double"   value="1.051e-02" />
-        <param name="accelerometer_random_walk"    type="double"   value="3.2e-05" />
-        <param name="gyroscope_noise_density"      type="double"   value="6.2e-02" />
-        <param name="gyroscope_random_walk"        type="double"   value="5.0e-06" />
+        <param name="accelerometer_noise_density"  type="double"   value="0.1051" />
+        <param name="accelerometer_random_walk"    type="double"   value="0.0032" />
+        <param name="gyroscope_noise_density"      type="double"   value="0.0062" />
+        <param name="gyroscope_random_walk"        type="double"   value="5e-04" />
 
         <!-- Updater Parameters -->
         <!-- Chi2 Parameters -->
         <param name="updater_chi2_multiplier" type="int" value="1" />
         <!-- Update Noise (sigma) Params -->
-        <param name="updater_rotation_noise" type="double" value="0.1" />
-        <param name="updater_translation_noise" type="double" value="0.1" />
+        <param name="updater_rotation_noise" type="double" value="0.2" />
+        <param name="updater_translation_noise" type="double" value="0.3" />
 
         <!-- State Initial Noise (sigma) Params -->
-        <param name="state_init_x_noise" type="double" value="0.5" />
-        <param name="state_init_y_noise" type="double" value="0.5" />
-        <param name="state_init_z_noise" type="double" value="0.5" />
+        <param name="state_init_x_noise" type="double" value="0.50" />
+        <param name="state_init_y_noise" type="double" value="0.50" />
+        <param name="state_init_z_noise" type="double" value="0.50" />
         <param name="state_init_rx_noise" type="double" value="0.1" />
         <param name="state_init_ry_noise" type="double" value="0.1" />
         <param name="state_init_rz_noise" type="double" value="0.1" />

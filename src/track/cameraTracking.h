@@ -30,9 +30,9 @@ namespace camimucalib_core {
             double timestamp;
             Eigen::Matrix4d pose;
         };
-        explicit  cameraTracking(int dx_ = 0.05, int dy_ = 0.05,
-                       double checkerboard_rows_ = 6,
-                       double checkerboard_cols_ = 7,
+        explicit  cameraTracking(double dx_ = 0.05, double dy_ = 0.05,
+                       int checkerboard_rows_ = 6,
+                       int checkerboard_cols_ = 7,
                        std::string cam_config_file_path_ = "");
         void readCameraParams(std::string cam_config_file_path,
                               int &image_height, int &image_width,

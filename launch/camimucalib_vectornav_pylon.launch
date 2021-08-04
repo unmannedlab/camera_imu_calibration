@@ -7,7 +7,7 @@
         <param name="topic_image"  type="string" value="pylon_camera_node/image_raw" />
 
         <!-- bag parameters -->
-    <param name = "path_bag" type="string" value="/home/usl/Downloads/kalibr_calibration/Subodh_new_data_bc_hes_picky_about_speed_2021-07-01-17-04-25.bag"/>
+        <param name = "path_bag" type="string" value="/home/usl/Downloads/kalibr_calibration/Subodh_new_data_bc_hes_picky_about_speed_2021-07-01-17-04-25.bag"/>
 <!--         <param name = "path_bag" type="string" value="/home/usl/Downloads/kalibr_calibration/Subodh_new_data_bc_hes_picky_about_speed_2021-07-01-17-05-44.bag"/> -->
         <param name="bag_start"   type="double" value="0.0" />
         <param name="bag_durr"    type="int"    value="-1" />
@@ -42,9 +42,9 @@
         <param name="state_init_x_noise" type="double" value="0.50" />
         <param name="state_init_y_noise" type="double" value="0.50" />
         <param name="state_init_z_noise" type="double" value="0.50" />
-        <param name="state_init_rx_noise" type="double" value="0.1" />
-        <param name="state_init_ry_noise" type="double" value="0.1" />
-        <param name="state_init_rz_noise" type="double" value="0.1" />
+        <param name="state_init_rx_noise" type="double" value="0.2" />
+        <param name="state_init_ry_noise" type="double" value="0.2" />
+        <param name="state_init_rz_noise" type="double" value="0.2" />
 
         <param name="state_init_timeoffset_noise" type="double" value="0.01" />
 

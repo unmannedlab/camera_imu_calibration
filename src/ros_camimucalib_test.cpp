@@ -93,5 +93,25 @@ int main (int argc, char** argv) {
             sys->feed_measurement_camera(time_lidar, image_in);
         }
     }
+    ROS_INFO_STREAM("Reached end of bag");
+    /// Write the final I_T_C1 to a text file
+    Eigen::Matrix4d C1_T_C2;
+    C1_T_C2 << 0,  0, 1, 0,
+              -1,  0, 0, 0,
+               0, -1, 0, 0,
+               0,  0, 0, 1;
+    camimucalib_estimator::State* state = sys->get_state();
+    Pose *calibration = state->_calib_CAMERAtoIMU;
+    Eigen::Matrix3d I_R_C1 = calibration->Rot();
+    Eigen::Vector3d I_t_C1 = calibration->pos();
+    Eigen::Matrix4d I_T_C1 = Eigen::Matrix4d::Identity();
+    I_T_C1.block(0, 0, 3, 3) = I_R_C1;
+    I_T_C1.block(0, 3, 3, 1) = I_t_C1;
+    Eigen::Matrix4d I_T_C2 = I_T_C1*C1_T_C2;
+    std::cout << "Writing KF calibration result to: " << params.calibration_result_filename << std::endl;
+    std::ofstream result_calibration;
+    result_calibration.open(params.calibration_result_filename.c_str());
+    result_calibration << I_T_C2;
+    result_calibration.close();
     return EXIT_SUCCESS;
 }

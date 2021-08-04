@@ -8,7 +8,7 @@ sigma_rxryrz = data_ext_calib(:, 8:10)*180/pi;
 %%
 figure('Name','Calibration XYZ KF','NumberTitle','off');
 subplot(311)
-plot(xyz(:,1), 'LineWidth', 3);
+plot(xyz(:,1),  '.', 'LineWidth', 3);
 %hold off;
 hold on;
 plot(xyz(:,1) + sigma_xyz(:,1), '--r', 'LineWidth', 3);
@@ -23,7 +23,7 @@ legend('Estimate', '1 \sigma bound');
 set(gca,'FontSize', 24);
 
 subplot(312)
-plot(xyz(:,2), 'LineWidth', 3);
+plot(xyz(:,2),  '.', 'LineWidth', 3);
 %hold off;
 hold on;
 plot(xyz(:,2) + sigma_xyz(:,2), '--r', 'LineWidth', 3);
@@ -38,7 +38,7 @@ legend('Estimate', '1 \sigma bound');
 set(gca,'FontSize', 24);
 
 subplot(313)
-plot(xyz(:,3), 'LineWidth', 3);
+plot(xyz(:,3),  '.', 'LineWidth', 3);
 %hold off;
 hold on;
 plot(xyz(:,3) + sigma_xyz(:,3), '--r', 'LineWidth', 3);
@@ -69,7 +69,7 @@ eulerangleDegreesPlus = eulerangleDegrees + sigma_rxryrz;
 %%
 figure('Name','Rotation Calibration KF','NumberTitle','off');
 subplot(311)
-plot(eulerangleDegrees(:,1), 'LineWidth', 3);
+plot(eulerangleDegrees(:,1),  '.', 'LineWidth', 3);
 hold on;
 plot(eulerangleDegreesMinus(:,1), '--r', 'LineWidth', 3);
 hold on;
@@ -84,7 +84,7 @@ legend('Estimate', '1 \sigma bound');
 set(gca,'FontSize', 24);
 
 subplot(312)
-plot(eulerangleDegrees(:,2), 'LineWidth', 3);
+plot(eulerangleDegrees(:,2), '.',  'LineWidth', 3);
 hold on;
 plot(eulerangleDegreesMinus(:,2),'--r', 'LineWidth', 3);
 hold on;
@@ -99,7 +99,7 @@ legend('Estimate', '1 \sigma bound');
 set(gca,'FontSize', 24);
 
 subplot(313)
-plot(eulerangleDegrees(:,3), 'LineWidth', 3);
+plot(eulerangleDegrees(:,3), '.',  'LineWidth', 3);
 hold on;
 plot(eulerangleDegreesMinus(:,3),'--r', 'LineWidth', 3);
 hold on;

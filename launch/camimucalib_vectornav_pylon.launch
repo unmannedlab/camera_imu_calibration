@@ -4,7 +4,7 @@
     <node name="ros_test_node" pkg="camera_imu_calibration" type="ros_test_node" output="screen" clear_params="true" required="true">
         <!-- bag topics -->
         <param name="topic_imu"    type="string" value="/vectornav/IMU" />
-        <param name="topic_image"  type="string" value="/pylon_camera_node/image_raw" />
+        <param name="topic_image"  type="string" value="pylon_camera_node/image_raw" />
 
         <!-- bag parameters -->
         <param name = "path_bag" type="string" value="/home/usl/Downloads/cam_imu_calibration/calibcheckerboard1.bag"/>

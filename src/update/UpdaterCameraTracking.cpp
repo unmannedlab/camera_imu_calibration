@@ -97,14 +97,14 @@ void UpdaterCameraTracking::updateImage2Image(State *current_state, relativePose
 
     if(_options.do_chi2_check) {
         if (chi2 > chi2_check/10) {
-            printf(BOLDRED "[Update] unsuccessful updateScan2Scan \n" RESET);
+            printf(BOLDRED "[Update] unsuccessful updateImage2Image \n" RESET);
             did_update = false;
             return;
         }
     }
     /// Update
     StateHelper::EKFUpdate(current_state, x_order, H_x, res_rot, std::pow(_options.noise_rotation, 2) * Eigen::MatrixXd::Identity(3, 3));
-    printf(BOLDGREEN "[Update] successful updateScan2Scan \n" RESET);
+    printf(BOLDGREEN "[Update] successful updateImage2Image \n" RESET);
     did_update = true;
 }
 
@@ -185,7 +185,7 @@ void UpdaterCameraTracking::updateImage2FirstImage(State *current_state, Eigen::
     /// TODO: I actually need to check if the dimension should be 3 or not, what does the dimension really mean physically?
     if(_options.do_chi2_check) {
         if (chi2 > chi2_check/10) {
-            printf(BOLDRED "[Update] unsuccessful updateScan2GlobalMap\n" RESET);
+            printf(BOLDRED "[Update] unsuccessful updateImage2FirstImage\n" RESET);
             did_update = false;
             return;
         }
@@ -193,6 +193,6 @@ void UpdaterCameraTracking::updateImage2FirstImage(State *current_state, Eigen::
 
     /// Update
     StateHelper::EKFUpdate(current_state, x_order, H_x, res_trans, R);
-    printf(BOLDGREEN "[Update] successful updateScan2GlobalMap\n" RESET);
+    printf(BOLDGREEN "[Update] successful updateImage2FirstImage\n" RESET);
     did_update = true;
 }

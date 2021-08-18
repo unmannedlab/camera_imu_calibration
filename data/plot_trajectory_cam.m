@@ -23,33 +23,33 @@ set(gca,'FontSize', 20);
 %%
 figure('Name', 'Camera Translation X, Y, Z','NumberTitle','off')
 subplot(311)
-plot(xyz(:,1), '.', 'LineWidth', 3);
+plot(xyz(:,1), 'LineWidth', 3);
 hold off;
 ylabel('X','fontweight','bold','fontsize',16);
 grid;
 title('X [m]','fontweight','bold','fontsize',16);
 xlabel('Time [s]','fontweight','bold','fontsize',16);
-legend('Estimate', '1 \sigma bound');
+%legend('Estimate', '1 \sigma bound');
 set(gca,'FontSize', 24);
 
 subplot(312)
-plot(xyz(:,2), '.', 'LineWidth', 3);
+plot(xyz(:,2), 'LineWidth', 3);
 hold off;
 ylabel('Y','fontweight','bold','fontsize',16);
 grid;
 title('Y [m]','fontweight','bold','fontsize',16);
 xlabel('Time [s]','fontweight','bold','fontsize',16);
-legend('Estimate', '1 \sigma bound');
+%legend('Estimate', '1 \sigma bound');
 set(gca,'FontSize', 24);
 
 subplot(313)
-plot(xyz(:,3), '.', 'LineWidth', 3);
+plot(xyz(:,3), 'LineWidth', 3);
 hold off;
 ylabel('Z','fontweight','bold','fontsize',16);
 grid;
 title('Z [m]','fontweight','bold','fontsize',16);
 xlabel('Time [s]','fontweight','bold','fontsize',16);
-legend('Estimate', '1 \sigma bound');
+%legend('Estimate', '1 \sigma bound');
 set(gca,'FontSize', 24);
 
 %%
@@ -65,31 +65,31 @@ end
 
 figure('Name', 'Camera Euler X, Y, Z Angles','NumberTitle','off')
 subplot(311)
-plot(eulerangleDegrees(:,1), '.', 'LineWidth', 3);
+plot(eulerangleDegrees(:,1), 'LineWidth', 3);
 hold off;
 ylabel('Euler X','fontweight','bold','fontsize',16);
 grid;
 title('Euler X [deg]','fontweight','bold','fontsize',16);
 xlabel('Time [s]','fontweight','bold','fontsize',16);
-legend('Estimate', '1 \sigma bound');
+%legend('Estimate', '1 \sigma bound');
 set(gca,'FontSize', 24);
 
 subplot(312)
-plot(eulerangleDegrees(:,2), '.', 'LineWidth', 3);
+plot(eulerangleDegrees(:,2), 'LineWidth', 3);
 hold off;
 ylabel('Euler Y','fontweight','bold','fontsize',16);
 grid;
 title('Euler Y [deg]','fontweight','bold','fontsize',16);
 xlabel('Time [s]','fontweight','bold','fontsize',16);
-legend('Estimate', '1 \sigma bound');
+%legend('Estimate', '1 \sigma bound');
 set(gca,'FontSize', 24);
 
 subplot(313)
-plot(eulerangleDegrees(:,3), '.', 'LineWidth', 3);
+plot(eulerangleDegrees(:,3), 'LineWidth', 3);
 hold off;
 ylabel('Euler Z','fontweight','bold','fontsize',16);
 grid;
 title('Euler Z [deg]','fontweight','bold','fontsize',16);
 xlabel('Time [s]','fontweight','bold','fontsize',16);
-legend('Estimate', '1 \sigma bound');
+%legend('Estimate', '1 \sigma bound');
 set(gca,'FontSize', 24);

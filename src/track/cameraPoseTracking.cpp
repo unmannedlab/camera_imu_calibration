@@ -1,11 +1,11 @@
-#include "cameraTracking.h"
+#include "cameraPoseTracking.h"
 
 namespace camimucalib_core {
 
-    cameraTracking::cameraTracking(double dx_, double dy_,
-                                   int checkerboard_rows_,
-                                   int checkerboard_cols_,
-                                   std::string cam_config_file_path_) {
+    cameraPoseTracking::cameraPoseTracking(double dx_, double dy_,
+                                           int checkerboard_rows_,
+                                           int checkerboard_cols_,
+                                           std::string cam_config_file_path_) {
         cam_config_file_path = cam_config_file_path_;
         dx = dx_;
         dy = dy_;
@@ -29,11 +29,11 @@ namespace camimucalib_core {
         C0_T_Ck_1 = Eigen::Matrix4d::Identity();
     }
 
-    void cameraTracking::readCameraParams(std::string cam_config_file_path,
-                                          int &image_height,
-                                          int &image_width,
-                                          cv::Mat &D,
-                                          cv::Mat &K) {
+    void cameraPoseTracking::readCameraParams(std::string cam_config_file_path,
+                                              int &image_height,
+                                              int &image_width,
+                                              cv::Mat &D,
+                                              cv::Mat &K) {
         cv::FileStorage fs_cam_config(cam_config_file_path, cv::FileStorage::READ);
         if(!fs_cam_config.isOpened())
             std::cerr << "Error: Wrong path: " << cam_config_file_path << std::endl;
@@ -54,7 +54,7 @@ namespace camimucalib_core {
         W_T_C_eig = Eigen::Matrix4d::Identity();
     }
 
-    bool cameraTracking::feedImage(double timestamp, cv::Mat input_image, Eigen::Matrix4d pose_predict) {
+    bool cameraPoseTracking::feedImage(double timestamp, cv::Mat input_image, Eigen::Matrix4d pose_predict) {
         current_timestamp = timestamp;
         image_in = input_image;
         bool boardDetectedInCam = cv::findChessboardCorners(image_in, cv::Size(checkerboard_cols, checkerboard_rows),
@@ -62,15 +62,15 @@ namespace camimucalib_core {
                                                                          cv::CALIB_CB_FAST_CHECK);
         cv::drawChessboardCorners(image_in, cv::Size(checkerboard_cols, checkerboard_rows), image_points, boardDetectedInCam);
         if(boardDetectedInCam) {
-            cv::cornerSubPix(image_in, image_points, cv::Size(21, 21),
-                             cv::Size(-1, -1), cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+//            cv::cornerSubPix(image_in, image_points, cv::Size(11, 11),
+//                             cv::Size(-1, -1), cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
             assert(image_points.size() == object_points.size());
             estimateCameraPose();
         }
         return boardDetectedInCam;
     }
 
-    void cameraTracking::estimateCameraPose() {
+    void cameraPoseTracking::estimateCameraPose() {
         cv::solvePnP(object_points, image_points, projection_matrix, distCoeff, rvec, tvec, false, CV_ITERATIVE);
         projected_points.clear();
         cv::projectPoints(object_points, rvec, tvec, projection_matrix, distCoeff, projected_points, cv::noArray());
@@ -110,11 +110,11 @@ namespace camimucalib_core {
         first_frame = false;
     }
 
-    relativePose cameraTracking::getRelativePose() {
+    relativePose cameraPoseTracking::getRelativePose() {
         return latestRP;
     }
 
-    cameraTracking::Odom cameraTracking::getCameraPose() {
+    cameraPoseTracking::Odom cameraPoseTracking::getCameraPose() {
         return currentpose;
     }
 }

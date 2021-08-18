@@ -51,9 +51,9 @@ camimucalib_estimator::camimucalibManager::camimucalibManager(camimucalib_estima
     /// Make the Updater
     updaterCameraTracking = new UpdaterCameraTracking(params.updaterOptions);
     /// Initialize the Camera Pose Object
-    cameraPoseTracker = std::make_shared<camimucalib_core::cameraTracking>(params.checkerboard_dx, params.checkerboard_dy,
-                                                                           params.checkerboard_rows, params.checkerboard_cols,
-                                                                           params.camera_calibration_file_path);
+    cameraPoseTracker = std::make_shared<camimucalib_core::cameraPoseTracking>(params.checkerboard_dx, params.checkerboard_dy,
+                                                                               params.checkerboard_rows, params.checkerboard_cols,
+                                                                               params.camera_calibration_file_path);
 }
 
 bool camimucalib_estimator::camimucalibManager::try_to_initialize() {
@@ -213,7 +213,7 @@ void camimucalib_estimator::camimucalibManager::printState() {
 //    std::cout << "Crashed here 5!" << std::endl;
 
     /// 6
-    cameraTracking::Odom camPose = cameraPoseTracker->getCameraPose();
+    cameraPoseTracking::Odom camPose = cameraPoseTracker->getCameraPose();
     Eigen::Matrix4d C0_T_Ck = camPose.pose;
     Eigen::Matrix3d C0_R_Ck = C0_T_Ck.block(0, 0, 3, 3);
 //    std::cout << "C0_T_Ck: \n" << std::endl;

@@ -3,7 +3,7 @@
 #include <rosbag/view.h>
 
 #include <iostream>
-#include "track/cameraTracking.h"
+#include "track/cameraPoseTracking.h"
 
 #include "core/camimucalibManagerOptions.h"
 #include "core/camimucalibManager.h"
@@ -91,6 +91,10 @@ int main (int argc, char** argv) {
             cv::Mat image_in = cv_bridge::toCvShare(s_image, "mono8")->image;
 //            ROS_INFO_STREAM("Feeding camera measurement");
             sys->feed_measurement_camera(time_lidar, image_in);
+            cv::Mat image_out;
+            cv::resize(image_in, image_out, cv::Size(), 0.5, 0.5);
+            cv::imshow("Image in", image_in);
+            cv::waitKey(10);
         }
     }
     ROS_INFO_STREAM("Reached end of bag");

@@ -17,7 +17,7 @@
 #include "state/StateHelper.h"
 #include "state/Propagator.h"
 #include "update/UpdaterCameraTracking.h"
-#include "track/cameraTracking.h"
+#include "track/cameraPoseTracking.h"
 
 #include "camimucalibManagerOptions.h"
 
@@ -55,7 +55,7 @@ namespace camimucalib_estimator {
         }
 
         /// Accessor to Camera Odometry object
-        camimucalib_core::cameraTracking::Ptr get_track_lodom() {
+        camimucalib_core::cameraPoseTracking::Ptr get_track_lodom() {
             return cameraPoseTracker;
         }
 
@@ -110,7 +110,7 @@ namespace camimucalib_estimator {
         UpdaterCameraTracking* updaterCameraTracking;
 
         /// Camera Pose object (Tracker)
-        camimucalib_core::cameraTracking::Ptr cameraPoseTracker;
+        camimucalib_core::cameraPoseTracking::Ptr cameraPoseTracker;
 
         /// Track the distance travelled
         double timelastupdate = -1;

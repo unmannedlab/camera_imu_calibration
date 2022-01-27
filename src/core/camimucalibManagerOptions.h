@@ -91,13 +91,14 @@ namespace camimucalib_estimator {
             printf("camera_calibration_file_path: %s\n", camera_calibration_file_path.c_str());
         }
 
-        /// CSV file as output
+        /// CSV filename as output
         std::string camimu_trajectory_filename;
         std::string camimu_bias_filename;
         std::string camimu_velocity_filename;
         std::string camimu_calib_extrinsic_filename;
         std::string camimu_calib_dt_filename;
         std::string camerapose_trajectory_filename;
+        std::string reprojection_error_filename;
 
         /// Initial calibration result filename
         std::string init_calibration_result_filename;

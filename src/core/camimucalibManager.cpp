@@ -28,6 +28,8 @@ camimucalib_estimator::camimucalibManager::camimucalibManager(camimucalib_estima
     calib_extrinsic_csv.open(params.camimu_calib_extrinsic_filename);
     calib_dt_csv.open(params.camimu_calib_dt_filename);
     visodom_csv.open(params.camerapose_trajectory_filename);
+    repErr_csv.open(params.reprojection_error_filename);
+
     /// Create the state
     state = new State(params.state_options);
 
@@ -131,7 +133,7 @@ void camimucalib_estimator::camimucalibManager::feed_measurement_camera(double t
     Eigen::Matrix4d I_T_C = Eigen::Matrix4d::Identity();
     I_T_C.block(0, 0, 3, 3) = I_R_C;
     I_T_C.block(0, 3, 3, 1) = I_t_C;
-    cameraPoseTracker->checkReprojections(I_T_C, I1_T_Ik);
+    repErr = cameraPoseTracker->checkReprojections(I_T_C, I1_T_Ik);
     /// Printing for debug
     logData();
 }
@@ -235,4 +237,6 @@ void camimucalib_estimator::camimucalibManager::logData() {
     visodom_csv << C0_quat_Ck.x() << ", " << C0_quat_Ck.y() << ", " << C0_quat_Ck.z() << ", " << C0_quat_Ck.w() << ", "
                  << C0_t_Ck.x() << ", " << C0_t_Ck.y() << ", "<< C0_t_Ck.z() << std::endl;
 
+    ///
+    repErr_csv << repErr << "\n";
 }

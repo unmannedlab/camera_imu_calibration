@@ -56,13 +56,15 @@ namespace camimucalib_core {
 
     bool cameraPoseTracking::feedImage(double timestamp, cv::Mat input_image, Eigen::Matrix4d pose_predict) {
         current_timestamp = timestamp;
-        image_in = input_image;
-        bool boardDetectedInCam = cv::findChessboardCorners(image_in, cv::Size(checkerboard_cols, checkerboard_rows),
+        image_in_for_poseestimation = input_image.clone();
+        image_in_for_visualization = input_image;
+        cv::cvtColor(image_in_for_poseestimation, image_in_for_poseestimation, cv::COLOR_BGR2GRAY);
+        bool boardDetectedInCam = cv::findChessboardCorners(image_in_for_poseestimation, cv::Size(checkerboard_cols, checkerboard_rows),
                                                             image_points,cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE +
                                                                          cv::CALIB_CB_FAST_CHECK);
-        cv::drawChessboardCorners(image_in, cv::Size(checkerboard_cols, checkerboard_rows), image_points, boardDetectedInCam);
+        cv::drawChessboardCorners(image_in_for_visualization, cv::Size(checkerboard_cols, checkerboard_rows), image_points, boardDetectedInCam);
         if(boardDetectedInCam) {
-//            cv::cornerSubPix(image_in, image_points, cv::Size(11, 11),
+//            cv::cornerSubPix(image_in_for_poseestimation, image_points, cv::Size(11, 11),
 //                             cv::Size(-1, -1), cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
             assert(image_points.size() == object_points.size());
             estimateCameraPose();
@@ -74,19 +76,26 @@ namespace camimucalib_core {
         cv::solvePnP(object_points, image_points, projection_matrix, distCoeff, rvec, tvec, false, cv::SOLVEPNP_ITERATIVE);
     }
 
-    void cameraPoseTracking::visualizeImageProjections(cv::Mat rvec, cv::Mat tvec) {
+    double cameraPoseTracking::visualizeImageProjections(cv::Mat rvec, cv::Mat tvec) {
         std::vector<cv::Point2f> projected_points;
-
         cv::projectPoints(object_points, rvec, tvec, projection_matrix, distCoeff, projected_points, cv::noArray());
 
+        double error = 0;
         for(int i = 0; i < projected_points.size(); i++){
-            cv::circle(image_in, projected_points[i], 3, cv::Scalar(0, 255, 0), -1, cv::LINE_AA, 0);
+//            cv::circle(image_in_for_visualization, projected_points[i], 3, cv::Scalar(185, 185, 45), -1, cv::LINE_AA, 0);
+            error += (projected_points[i].x - image_points[i].x)*(projected_points[i].x - image_points[i].x);
+            error += (projected_points[i].y - image_points[i].y)*(projected_points[i].y - image_points[i].y);
+            cv::arrowedLine(image_in_for_visualization, image_points[i], projected_points[i], cv::Scalar(185, 185, 45),
+                 2, cv::LINE_4);
         }
+
+        error = sqrt(error/projected_points.size());
+        return error;
     }
 
     void cameraPoseTracking::estimateCameraPose() {
         solvePnPProblem();
-        visualizeImageProjections(rvec, tvec);
+//        visualizeImageProjections(rvec, tvec);
 
         cv::Rodrigues(rvec, C_R_W);
         cv::cv2eigen(C_R_W, C_R_W_eig);
@@ -118,7 +127,7 @@ namespace camimucalib_core {
         first_frame = false;
     }
 
-    void cameraPoseTracking::checkReprojections(Eigen::Matrix4d I_T_C, Eigen::Matrix4d I0_T_Ik) {
+    double cameraPoseTracking::checkReprojections(Eigen::Matrix4d I_T_C, Eigen::Matrix4d I0_T_Ik) {
         Eigen::Matrix4d w_T_c = W_T_C_eig_first*camera2ros.inverse()*I_T_C.inverse()*I0_T_Ik*I_T_C*camera2ros;
         Eigen::Matrix4d c_T_w = w_T_c.inverse();
         Eigen::Matrix3d c_R_w = c_T_w.block(0, 0, 3, 3);
@@ -128,7 +137,24 @@ namespace camimucalib_core {
         cv::eigen2cv(c_R_w, c_R_w_cv);
         cv::eigen2cv(c_t_w,c_t_w_cv);
         cv::Rodrigues(c_R_w_cv, rvec);
-        visualizeImageProjections(rvec, c_t_w_cv);
+
+        double reperr = visualizeImageProjections(rvec, c_t_w_cv);
+        cumulative_rep_err += reperr;
+        cv::putText(image_in_for_visualization, //target image
+                    "Current Rep Error: " + std::to_string(reperr), //text
+                    cv::Point(image_in_for_visualization.cols / 2-400, 80),
+                    cv::FONT_HERSHEY_DUPLEX,
+                    2.0,
+                    CV_RGB(118, 185, 0), //font color
+                    4);
+        cv::putText(image_in_for_visualization, //target image
+                    "Cumulative Rep Error: " + std::to_string(cumulative_rep_err), //text
+                    cv::Point(image_in_for_visualization.cols / 2-400, 160),
+                    cv::FONT_HERSHEY_DUPLEX,
+                    2.0,
+                    CV_RGB(118, 185, 0), //font color
+                    4);
+        return reperr;
     }
 
     relativePose cameraPoseTracking::getRelativePose() {

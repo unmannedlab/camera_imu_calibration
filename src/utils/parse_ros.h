@@ -90,6 +90,9 @@ namespace camimucalib_estimator {
         ROS_INFO_STREAM("Reading camera pose output trajectory file name");
         nh.param("camerapose_trajectory_filename", params.camerapose_trajectory_filename, params.camerapose_trajectory_filename);
 
+        ROS_INFO_STREAM("Reading reprojection error file name");
+        nh.param("reprojection_error_filename", params.reprojection_error_filename, params.reprojection_error_filename);
+
         /// File to read the initial calibration result from
         ROS_INFO_STREAM("Reading the filename to read the initial calibration result to");
         nh.param("init_calibration_result_filename", params.init_calibration_result_filename, params.init_calibration_result_filename);
@@ -109,11 +112,11 @@ namespace camimucalib_estimator {
 
         // Read in from ROS, and save into our eigen mat
         ROS_INFO_STREAM("Reading initial I_T_C");
-        Eigen::Matrix4d T_offset = Eigen::Matrix4d::Identity();
-        T_offset(0, 0) = 0; T_offset(0, 1) = 1; T_offset(0, 2) = 0;
-        T_offset(1, 0) = 0; T_offset(1, 1) = 0; T_offset(1, 2) = -1;
-        T_offset(2, 0) = -1; T_offset(2, 1) = 0; T_offset(2, 2) = 0;
-        I_T_C = T_offset*T;
+//        Eigen::Matrix4d T_offset = Eigen::Matrix4d::Identity();
+//        T_offset(0, 0) = 0; T_offset(0, 1) = 1; T_offset(0, 2) = 0;
+//        T_offset(1, 0) = 0; T_offset(1, 1) = 0; T_offset(1, 2) = -1;
+//        T_offset(2, 0) = -1; T_offset(2, 1) = 0; T_offset(2, 2) = 0;
+        I_T_C = T;
         ROS_INFO_STREAM("I_T_C initialized at: \n" << I_T_C << "\n");
         // Load these into our state
         Eigen::Matrix<double,7,1> camera_imu_extrinsics_ITC;

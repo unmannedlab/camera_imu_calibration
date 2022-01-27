@@ -42,7 +42,7 @@
         <param name="updater_chi2_multiplier" type="int" value="1" />
         <!-- Update Noise (sigma) Params -->
         <param name="updater_translation_noise" type="double" value="0.1" />
-        <param name="updater_rotation_noise" type="double" value="0.2" />
+        <param name="updater_rotation_noise" type="double" value="0.1" />
 
         <!-- State Initial Noise (sigma) Params -->
         <param name="state_init_x_noise" type="double" value="0.50" />
@@ -62,6 +62,8 @@
 
         <!-- initial calibration file -->
         <param name="init_calibration_result_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/I_T_C_init.txt"/>
+<!--         <param name="init_calibration_result_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/I_T_C_kalibr.txt"/> -->
+<!--         <param name="init_calibration_result_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/I_T_C_cincalib.txt"/> -->
 
         <!-- Camera Tracking Parameters -->
         <param name="checkerboard_dx" type="double" value="0.0715"/>
@@ -77,6 +79,7 @@
         <param name="camimu_calib_extrinsic_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/camimu_calib_extrinsic.csv"/>
         <param name="camimu_calib_dt_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/camimu_calib_dt.csv"/>
         <param name="camerapose_trajectory_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/camerapose_trajectory.csv"/>
+        <param name="reprojection_error_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/reprojection_error.csv"/>
 
         <!-- output -->
         <param name="calibration_result_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/I_T_C.txt"/>

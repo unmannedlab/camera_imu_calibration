@@ -129,9 +129,13 @@ namespace camimucalib_estimator {
         std::ofstream calib_extrinsic_csv;
         std::ofstream calib_dt_csv;
         std::ofstream visodom_csv;
+        std::ofstream repErr_csv;
 
         /// Update flags
         bool did_update1 = false, did_update2 = false;
+
+        /// Reprojection Error for verification
+        double repErr;
     };
 }
 #endif //CAMIMUCALIB_ESTIMATOR_CAMIMUCALIBMANAGER_H

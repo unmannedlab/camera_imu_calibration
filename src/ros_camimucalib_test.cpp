@@ -71,6 +71,7 @@ int main (int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
+    cv::VideoWriter video("/home/smishr30/Downloads/output_video_cincalib/outcpp.avi", cv::VideoWriter::fourcc('M','J','P','G'), 10, cv::Size(1920,1200));
     for (const rosbag::MessageInstance& m : view) {
         if (!ros::ok())
             break;
@@ -89,14 +90,20 @@ int main (int argc, char** argv) {
         if (s_image != nullptr && m.getTopic() == topic_image) {
             double time_lidar = (*s_image).header.stamp.toSec();
             cv::Mat image_in = cv_bridge::toCvShare(s_image, "mono8")->image;
+            cv::Mat image_in_color;
+            cv::cvtColor(image_in, image_in_color, cv::COLOR_GRAY2BGR);
 //            ROS_INFO_STREAM("Feeding camera measurement");
-            sys->feed_measurement_camera(time_lidar, image_in);
+            sys->feed_measurement_camera(time_lidar, image_in_color);
             cv::Mat image_out;
-            cv::resize(image_in, image_out, cv::Size(), 0.5, 0.5);
-            cv::imshow("Image", image_in);
+            cv::resize(image_in_color, image_out, cv::Size(), 0.5, 0.5);
+            cv::imshow("Image", image_in_color);
+            video.write(image_in_color);
+
             cv::waitKey(10);
         }
     }
+    video.release();
+
     ROS_INFO_STREAM("Reached end of bag");
     /// Write the final I_T_C1 to a text file
     Eigen::Matrix4d C1_T_C2;
@@ -112,12 +119,12 @@ int main (int argc, char** argv) {
     I_T_C1.block(0, 0, 3, 3) = I_R_C1;
     I_T_C1.block(0, 3, 3, 1) = I_t_C1;
     Eigen::Matrix4d I_T_C2 = I_T_C1*C1_T_C2;
-    std::cout << "I_T_C1: \n" << I_T_C1 << std::endl;
-    std::cout << "I_T_C: \n" << I_T_C2 << std::endl;
+//    std::cout << "I_T_C1: \n" << I_T_C1 << std::endl;
+//    std::cout << "I_T_C: \n" << I_T_C2 << std::endl;
     std::cout << "Writing KF calibration result to: " << params.calibration_result_filename << std::endl;
     std::ofstream result_calibration;
     result_calibration.open(params.calibration_result_filename.c_str());
-    result_calibration << I_T_C2;
+    result_calibration << I_T_C1;
     result_calibration.close();
     return EXIT_SUCCESS;
 }

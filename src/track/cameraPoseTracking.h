@@ -40,14 +40,16 @@ namespace camimucalib_core {
         bool feedImage(double timestamp, cv::Mat input_image,
                        Eigen::Matrix4d pose_predict = Eigen::Matrix4d::Identity());
         void solvePnPProblem();
-        void visualizeImageProjections(cv::Mat rvec, cv::Mat tvec);
+        double visualizeImageProjections(cv::Mat rvec, cv::Mat tvec);
         void estimateCameraPose();
         Odom getCameraPose();
         relativePose getRelativePose();
-        void checkReprojections(Eigen::Matrix4d I_T_C, Eigen::Matrix4d I0_T_Ik);
+        double checkReprojections(Eigen::Matrix4d I_T_C, Eigen::Matrix4d I0_T_Ik);
 
     private:
-        cv::Mat image_in;
+        cv::Mat image_in_for_poseestimation;
+        cv::Mat image_in_for_visualization;
+
         cv::Mat projection_matrix;
         cv::Mat distCoeff;
         int image_height, image_width;
@@ -80,6 +82,8 @@ namespace camimucalib_core {
         Eigen::Matrix4d C0_T_Ck_1;
 
         relativePose latestRP; // latest relative pose
+
+        double cumulative_rep_err = 0;
     };
 }
 

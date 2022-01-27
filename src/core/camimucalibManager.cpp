@@ -84,7 +84,7 @@ bool camimucalib_estimator::camimucalibManager::try_to_initialize() {
     state->_imu->set_fe(imu_val);
     state->_timestamp = time0;
     startup_time = time0;
-    printState();
+    logData();
     return true;
 }
 
@@ -107,7 +107,7 @@ void camimucalib_estimator::camimucalibManager::feed_measurement_camera(double t
 
     bool boarddetected = cameraPoseTracker->feedImage(timestamp, image_in);
 
-    do_propagate_update(timestamp, boarddetected);
+    bool did_propagate_update = do_propagate_update(timestamp, boarddetected);
 
     if(state->_clones_IMU.size() == 1) {
         /// G_T_I1
@@ -118,14 +118,28 @@ void camimucalib_estimator::camimucalibManager::feed_measurement_camera(double t
         G_T_I1.block(0, 0, 3, 3) = G_R_I1;
         G_T_I1.block(0, 3, 3, 1) = G_t_I1;
     }
+    Eigen::Matrix4d G_T_Ik = Eigen::Matrix4d::Identity();
+    Eigen::Matrix3d Ik_R_G = camimucalib_core::quat_2_Rot(state->_imu->quat());
+    Eigen::Matrix3d G_R_Ik = Ik_R_G.transpose();
+    Eigen::Vector3d G_t_Ik = state->_imu->pos();
+    G_T_Ik.block(0, 0, 3, 3) = G_R_Ik;
+    G_T_Ik.block(0, 3, 3, 1) = G_t_Ik;
+    Eigen::Matrix4d I1_T_Ik = G_T_I1.inverse()*G_T_Ik;
+    Pose *calibration = state->_calib_CAMERAtoIMU;
+    Eigen::Matrix3d I_R_C = calibration->Rot();
+    Eigen::Vector3d I_t_C = calibration->pos();
+    Eigen::Matrix4d I_T_C = Eigen::Matrix4d::Identity();
+    I_T_C.block(0, 0, 3, 3) = I_R_C;
+    I_T_C.block(0, 3, 3, 1) = I_t_C;
+    cameraPoseTracker->checkReprojections(I_T_C, I1_T_Ik);
     /// Printing for debug
-    printState();
+    logData();
 }
 
-void camimucalib_estimator::camimucalibManager::do_propagate_update(double timestamp, bool boarddetected) {
+bool camimucalib_estimator::camimucalibManager::do_propagate_update(double timestamp, bool boarddetected) {
     if(state->_timestamp >= timestamp) {
         printf(YELLOW "Stepping back in time!!! (prop dt = %3f)\n" RESET, (timestamp-state->_timestamp));
-        return;
+        return false;
     }
     /// Propagate the state forward to the current update time
     /// Also augment it with a clone!
@@ -134,11 +148,11 @@ void camimucalib_estimator::camimucalibManager::do_propagate_update(double times
     if (state->_timestamp != timestamp) {
         printf(RED "[PROP]: Propagator unable to propagate the state forward in time!\n" RESET);
         printf(RED "[PROP]: It has been %.3f since last time we propagated\n" RESET,timestamp-state->_timestamp);
-        return;
+        return false;
     }
     if(state->_clones_IMU.size() < 2) {
         printf(YELLOW "[camimucalib_estimator::camimucalibManager::do_propagate_update] state->_clones_IMU.size() must be > 2\n");
-        return;
+        return false;
     }
     std::cout << "Board Detected ?: " << boarddetected << std::endl;
     if (boarddetected) {
@@ -150,27 +164,25 @@ void camimucalib_estimator::camimucalibManager::do_propagate_update(double times
         updaterCameraTracking->updateImage2Image(state, rP, did_update1);
         Eigen::Matrix4d Im1_T_Imk = cameraPoseTracker->getCameraPose().pose;
         updaterCameraTracking->updateImage2FirstImage(state, Im1_T_Imk, G_T_I1, timestamp, did_update2);
+        if(did_update1 && did_update2)
+            return true;
     }
+    return false;
 }
 
-void camimucalib_estimator::camimucalibManager::printState() {
+void camimucalib_estimator::camimucalibManager::logData() {
 //    std::cout << YELLOW << "Started Printing" << std::endl;
     Pose* calib = state->_calib_CAMERAtoIMU;
     Eigen::Matrix3d I_R_G = camimucalib_core::quat_2_Rot(state->_imu->quat());
-    Eigen::Vector3d G_euler_I = (I_R_G.transpose()).eulerAngles(0, 1, 2);
-    double roll = atan2(sin(G_euler_I.x()), cos(G_euler_I.x()))*180/M_PI;
-    double pitch = atan2(sin(G_euler_I.y()), cos(G_euler_I.y()))*180/M_PI;
-    double yaw = atan2(sin(G_euler_I.z()), cos(G_euler_I.z()))*180/M_PI;
+    Eigen::Matrix3d G_R_I = I_R_G.transpose();
+    Eigen::Quaterniond G_quat_I(G_R_I);
 
     /// 1
     std::vector<Type*> statevars_pose;
     statevars_pose.push_back(state->_imu->pose());
     Eigen::Matrix<double, 6, 6> covariance_imu_pose = StateHelper::get_marginal_covariance(state, statevars_pose);
-    trajfile_csv << state->_imu->quat().x() << ", " << state->_imu->quat().y() << ", "
-                 << state->_imu->quat().z() << ", " << state->_imu->quat().w() << ", "
-                 << state->_imu->pos().x() << ", " << state->_imu->pos().y() << ", "
-                 << state->_imu->pos().z() << ", " << state->_imu->vel().x() << ", "
-                 << state->_imu->vel().y() << ", " << state->_imu->vel().z() << std::endl;
+    trajfile_csv << G_quat_I.x() << ", " << G_quat_I.y() << ", " << G_quat_I.z() << ", " << G_quat_I.w() << ", "
+                 << state->_imu->pos().x() << ", " << state->_imu->pos().y() << ", " << state->_imu->pos().z()  << std::endl;
 
     /// 2
     std::vector<Type*> statevars_bias_a;

@@ -18,9 +18,7 @@ hold off;
 ylabel('Calib X [m]','fontweight','bold','fontsize',16);
 grid;
 title('Calib X [m]','fontweight','bold','fontsize',16);
-xlabel('Time [s]','fontweight','bold','fontsize',16);
-legend('Estimate', '1 \sigma bound');
-set(gca,'FontSize', 24);
+xlabel('Time [s]','fontweight','bold','fontsize',16)
 
 subplot(312)
 plot(xyz(:,2),  '.', 'LineWidth', 3);
@@ -34,8 +32,6 @@ ylabel('Calib Y [m]','fontweight','bold','fontsize',16);
 grid;
 title('Calib Y [m]','fontweight','bold','fontsize',16);
 xlabel('Time [s]','fontweight','bold','fontsize',16);
-legend('Estimate', '1 \sigma bound');
-set(gca,'FontSize', 24);
 
 subplot(313)
 plot(xyz(:,3),  '.', 'LineWidth', 3);
@@ -49,8 +45,6 @@ ylabel('Calib Z [m]','fontweight','bold','fontsize',16);
 grid;
 title('Calib Z [m]','fontweight','bold','fontsize',16);
 xlabel('Time [s]','fontweight','bold','fontsize',16);
-legend('Estimate', '1 \sigma bound');
-set(gca,'FontSize', 24);
 
 
 %%

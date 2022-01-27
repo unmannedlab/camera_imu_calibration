@@ -109,7 +109,12 @@ namespace camimucalib_estimator {
 
         // Read in from ROS, and save into our eigen mat
         ROS_INFO_STREAM("Reading initial I_T_C");
-        I_T_C = T;
+        Eigen::Matrix4d T_offset = Eigen::Matrix4d::Identity();
+        T_offset(0, 0) = 0; T_offset(0, 1) = 1; T_offset(0, 2) = 0;
+        T_offset(1, 0) = 0; T_offset(1, 1) = 0; T_offset(1, 2) = -1;
+        T_offset(2, 0) = -1; T_offset(2, 1) = 0; T_offset(2, 2) = 0;
+        I_T_C = T_offset*T;
+        ROS_INFO_STREAM("I_T_C initialized at: \n" << I_T_C << "\n");
         // Load these into our state
         Eigen::Matrix<double,7,1> camera_imu_extrinsics_ITC;
         camera_imu_extrinsics_ITC.block(0,0,4,1) = rot_2_quat(I_T_C.block(0,0,3,3));

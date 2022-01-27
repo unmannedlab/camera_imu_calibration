@@ -39,9 +39,12 @@ namespace camimucalib_core {
                               cv::Mat &D, cv::Mat &K);
         bool feedImage(double timestamp, cv::Mat input_image,
                        Eigen::Matrix4d pose_predict = Eigen::Matrix4d::Identity());
+        void solvePnPProblem();
+        void visualizeImageProjections(cv::Mat rvec, cv::Mat tvec);
         void estimateCameraPose();
         Odom getCameraPose();
         relativePose getRelativePose();
+        void checkReprojections(Eigen::Matrix4d I_T_C, Eigen::Matrix4d I0_T_Ik);
 
     private:
         cv::Mat image_in;
@@ -51,7 +54,6 @@ namespace camimucalib_core {
 
         std::vector<cv::Point2f> image_points;
         std::vector<cv::Point3f> object_points;
-        std::vector<cv::Point2f> projected_points;
 
         double dx, dy;
         int checkerboard_rows, checkerboard_cols;

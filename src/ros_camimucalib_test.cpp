@@ -93,7 +93,7 @@ int main (int argc, char** argv) {
             sys->feed_measurement_camera(time_lidar, image_in);
             cv::Mat image_out;
             cv::resize(image_in, image_out, cv::Size(), 0.5, 0.5);
-            cv::imshow("Image in", image_in);
+            cv::imshow("Image", image_in);
             cv::waitKey(10);
         }
     }
@@ -112,6 +112,8 @@ int main (int argc, char** argv) {
     I_T_C1.block(0, 0, 3, 3) = I_R_C1;
     I_T_C1.block(0, 3, 3, 1) = I_t_C1;
     Eigen::Matrix4d I_T_C2 = I_T_C1*C1_T_C2;
+    std::cout << "I_T_C1: \n" << I_T_C1 << std::endl;
+    std::cout << "I_T_C: \n" << I_T_C2 << std::endl;
     std::cout << "Writing KF calibration result to: " << params.calibration_result_filename << std::endl;
     std::ofstream result_calibration;
     result_calibration.open(params.calibration_result_filename.c_str());

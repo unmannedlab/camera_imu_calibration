@@ -70,16 +70,24 @@ namespace camimucalib_core {
         return boardDetectedInCam;
     }
 
-    void cameraPoseTracking::estimateCameraPose() {
-        cv::solvePnP(object_points, image_points, projection_matrix, distCoeff, rvec, tvec, false, CV_ITERATIVE);
-        projected_points.clear();
+    void cameraPoseTracking::solvePnPProblem() {
+        cv::solvePnP(object_points, image_points, projection_matrix, distCoeff, rvec, tvec, false, cv::SOLVEPNP_ITERATIVE);
+    }
+
+    void cameraPoseTracking::visualizeImageProjections(cv::Mat rvec, cv::Mat tvec) {
+        std::vector<cv::Point2f> projected_points;
+
         cv::projectPoints(object_points, rvec, tvec, projection_matrix, distCoeff, projected_points, cv::noArray());
+
         for(int i = 0; i < projected_points.size(); i++){
             cv::circle(image_in, projected_points[i], 3, cv::Scalar(0, 255, 0), -1, cv::LINE_AA, 0);
         }
+    }
 
-//        cv::imshow("image_in", image_in);
-//        cv::waitKey(10);
+    void cameraPoseTracking::estimateCameraPose() {
+        solvePnPProblem();
+        visualizeImageProjections(rvec, tvec);
+
         cv::Rodrigues(rvec, C_R_W);
         cv::cv2eigen(C_R_W, C_R_W_eig);
         C_t_W_eig = Eigen::Vector3d(tvec.at<double>(0),tvec.at<double>(1),tvec.at<double>(2));
@@ -108,6 +116,19 @@ namespace camimucalib_core {
         C0_T_Ck_1 = C0_T_Ck;
         previous_timestamp = current_timestamp;
         first_frame = false;
+    }
+
+    void cameraPoseTracking::checkReprojections(Eigen::Matrix4d I_T_C, Eigen::Matrix4d I0_T_Ik) {
+        Eigen::Matrix4d w_T_c = W_T_C_eig_first*camera2ros.inverse()*I_T_C.inverse()*I0_T_Ik*I_T_C*camera2ros;
+        Eigen::Matrix4d c_T_w = w_T_c.inverse();
+        Eigen::Matrix3d c_R_w = c_T_w.block(0, 0, 3, 3);
+        cv::Mat c_R_w_cv, rvec;
+        Eigen::Vector3d c_t_w = c_T_w.block(0, 3, 3, 1);
+        cv::Mat c_t_w_cv;
+        cv::eigen2cv(c_R_w, c_R_w_cv);
+        cv::eigen2cv(c_t_w,c_t_w_cv);
+        cv::Rodrigues(c_R_w_cv, rvec);
+        visualizeImageProjections(rvec, c_t_w_cv);
     }
 
     relativePose cameraPoseTracking::getRelativePose() {

@@ -83,13 +83,13 @@ namespace camimucalib_estimator {
         Eigen::Matrix4d G_T_I1 = Eigen::Matrix4d::Identity();
 
         /// Print State for debugging
-        void printState();
+        void logData();
 
 
     protected:
 
         /// This will do propagation and updates
-        void do_propagate_update(double timestamp, bool boarddetected);
+        bool do_propagate_update(double timestamp, bool boarddetected);
 
         ///The following will update our historical tracking information
         void update_keyframe_historical_information();

@@ -7,7 +7,7 @@
 using namespace camimucalib_core;
 using namespace camimucalib_estimator;
 
-void UpdaterCameraTracking::updateImage2Image(State *current_state, relativePose lodom, bool &did_update) {
+double UpdaterCameraTracking::updateImage2Image(State *current_state, relativePose lodom, bool &did_update) {
     /// Li_T_Lj
     Eigen::Matrix4d Li_T_Lj = lodom.odometry_ij;
 
@@ -99,16 +99,17 @@ void UpdaterCameraTracking::updateImage2Image(State *current_state, relativePose
         if (chi2 > chi2_check/10) {
             printf(BOLDRED "[Update] unsuccessful updateImage2Image \n" RESET);
             did_update = false;
-            return;
+            return -1;
         }
     }
     /// Update
     StateHelper::EKFUpdate(current_state, x_order, H_x, res_rot, std::pow(_options.noise_rotation, 2) * Eigen::MatrixXd::Identity(3, 3));
     printf(BOLDGREEN "[Update] successful updateImage2Image \n" RESET);
     did_update = true;
+    return sqrt(chi2);
 }
 
-void UpdaterCameraTracking::updateImage2FirstImage(State *current_state, Eigen::Matrix4d L1_T_Lk, Eigen::Matrix4d G_T_I1, double timestamp, bool& did_update) {
+double UpdaterCameraTracking::updateImage2FirstImage(State *current_state, Eigen::Matrix4d L1_T_Lk, Eigen::Matrix4d G_T_I1, double timestamp, bool& did_update) {
     /// Initial IMU pose
     Eigen::Matrix<double, 3, 3> G_R_I1 = G_T_I1.block(0, 0, 3, 3);
     Eigen::Matrix<double, 3, 1> G_t_I1 = G_T_I1.block(0, 3, 3, 1);
@@ -187,7 +188,7 @@ void UpdaterCameraTracking::updateImage2FirstImage(State *current_state, Eigen::
         if (chi2 > chi2_check/10) {
             printf(BOLDRED "[Update] unsuccessful updateImage2FirstImage\n" RESET);
             did_update = false;
-            return;
+            return -1;
         }
     }
 
@@ -195,4 +196,5 @@ void UpdaterCameraTracking::updateImage2FirstImage(State *current_state, Eigen::
     StateHelper::EKFUpdate(current_state, x_order, H_x, res_trans, R);
     printf(BOLDGREEN "[Update] successful updateImage2FirstImage\n" RESET);
     did_update = true;
+    return sqrt(chi2);
 }

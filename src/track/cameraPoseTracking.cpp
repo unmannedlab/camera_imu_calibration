@@ -60,8 +60,7 @@ namespace camimucalib_core {
         image_in_for_visualization = input_image;
         cv::cvtColor(image_in_for_poseestimation, image_in_for_poseestimation, cv::COLOR_BGR2GRAY);
         bool boardDetectedInCam = cv::findChessboardCorners(image_in_for_poseestimation, cv::Size(checkerboard_cols, checkerboard_rows),
-                                                            image_points,cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE +
-                                                                         cv::CALIB_CB_FAST_CHECK);
+                                                            image_points);
         cv::drawChessboardCorners(image_in_for_visualization, cv::Size(checkerboard_cols, checkerboard_rows), image_points, boardDetectedInCam);
         if(boardDetectedInCam) {
 //            cv::cornerSubPix(image_in_for_poseestimation, image_points, cv::Size(11, 11),

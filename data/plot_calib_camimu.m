@@ -50,11 +50,10 @@ xlabel('Time [s]','fontweight','bold','fontsize',16);
 %%
 eulerangleDegrees = [];
 for i=1:length(quat)
-    quat_i = quaternion(quat(i, 4), quat(i, 1), quat(i, 2), quat(i, 3));
-    eulerAngles = eulerd(quat_i, 'XYZ', 'frame');
-    euler_x = wrapTo360(eulerAngles(:, 1));
-    euler_y = eulerAngles(:, 2);
-    euler_z = eulerAngles(:, 3);
+    eulerAngle = quaternion2euler([quat(i, 4), quat(i, 1), quat(i, 2), quat(i, 3)]);
+    euler_x = eulerAngle(1)*180/pi;
+    euler_y = eulerAngle(2)*180/pi;
+    euler_z = eulerAngle(3)*180/pi;
     eulerangleDegrees = [eulerangleDegrees; [euler_x, euler_y, euler_z]];
 end
 eulerangleDegreesMinus = eulerangleDegrees - sigma_rxryrz;

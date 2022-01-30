@@ -28,7 +28,7 @@ camimucalib_estimator::camimucalibManager::camimucalibManager(camimucalib_estima
     calib_extrinsic_csv.open(params.camimu_calib_extrinsic_filename);
     calib_dt_csv.open(params.camimu_calib_dt_filename);
     visodom_csv.open(params.camerapose_trajectory_filename);
-    repErr_csv.open(params.reprojection_error_filename);
+    residual_csv.open(params.reprojection_error_filename);
 
     /// Create the state
     state = new State(params.state_options);
@@ -86,6 +86,11 @@ bool camimucalib_estimator::camimucalibManager::try_to_initialize() {
     state->_imu->set_fe(imu_val);
     state->_timestamp = time0;
     startup_time = time0;
+    Eigen::Matrix3d I0_R_G = camimucalib_core::quat_2_Rot(q_GtoI0);
+    Eigen::Matrix3d G_R_I0 = I0_R_G.transpose();
+    Eigen::Vector3d G_t_I0 = state->_imu->pos();
+    G_T_I0.block(0, 0, 3, 3) = G_R_I0;
+    G_T_I0.block(0, 3, 3, 1) = G_t_I0;
     logData();
     return true;
 }
@@ -120,20 +125,22 @@ void camimucalib_estimator::camimucalibManager::feed_measurement_camera(double t
         G_T_I1.block(0, 0, 3, 3) = G_R_I1;
         G_T_I1.block(0, 3, 3, 1) = G_t_I1;
     }
+
     Eigen::Matrix4d G_T_Ik = Eigen::Matrix4d::Identity();
     Eigen::Matrix3d Ik_R_G = camimucalib_core::quat_2_Rot(state->_imu->quat());
     Eigen::Matrix3d G_R_Ik = Ik_R_G.transpose();
     Eigen::Vector3d G_t_Ik = state->_imu->pos();
     G_T_Ik.block(0, 0, 3, 3) = G_R_Ik;
     G_T_Ik.block(0, 3, 3, 1) = G_t_Ik;
-    Eigen::Matrix4d I1_T_Ik = G_T_I1.inverse()*G_T_Ik;
+    Eigen::Matrix4d I0_T_Ik = G_T_I0.inverse()*G_T_Ik;
     Pose *calibration = state->_calib_CAMERAtoIMU;
     Eigen::Matrix3d I_R_C = calibration->Rot();
     Eigen::Vector3d I_t_C = calibration->pos();
     Eigen::Matrix4d I_T_C = Eigen::Matrix4d::Identity();
     I_T_C.block(0, 0, 3, 3) = I_R_C;
     I_T_C.block(0, 3, 3, 1) = I_t_C;
-    repErr = cameraPoseTracker->checkReprojections(I_T_C, I1_T_Ik);
+    residual = cameraPoseTracker->checkReprojections(I_T_C, I0_T_Ik);
+    std::cout << "Residual: " << residual << std::endl;
     /// Printing for debug
     logData();
 }
@@ -163,11 +170,14 @@ bool camimucalib_estimator::camimucalibManager::do_propagate_update(double times
             StateHelper::marginalize_old_clone(state);
         }
         relativePose rP = cameraPoseTracker->getRelativePose();
-        updaterCameraTracking->updateImage2Image(state, rP, did_update1);
+        double residua1 = updaterCameraTracking->updateImage2Image(state, rP, did_update1);
         Eigen::Matrix4d Im1_T_Imk = cameraPoseTracker->getCameraPose().pose;
-        updaterCameraTracking->updateImage2FirstImage(state, Im1_T_Imk, G_T_I1, timestamp, did_update2);
-        if(did_update1 && did_update2)
+        double residua2 = updaterCameraTracking->updateImage2FirstImage(state, Im1_T_Imk, G_T_I1, timestamp, did_update2);
+        if(did_update1 && did_update2) {
+//            residual = residua1 + residua2;
+//            std::cout << YELLOW << "Current Residual: " << residua1+residua2 << std::endl;
             return true;
+        }
     }
     return false;
 }
@@ -215,7 +225,7 @@ void camimucalib_estimator::camimucalibManager::logData() {
                         << sqrt(covariance_calib_extrinsic(3, 3)) << ", " << sqrt(covariance_calib_extrinsic(4, 4)) << ", " << sqrt(covariance_calib_extrinsic(5, 5)) << std::endl;
 
 //    std::cout << "Crashed here 1!" << std::endl;
-//    /// 5
+    /// 5
 //    std::vector<Type*> statevars_calib_dt;
 //    statevars_calib_dt.push_back(state->_calib_dt_CAMERAtoIMU);
 //    std::cout << "Crashed here 2!" << std::endl;
@@ -238,5 +248,5 @@ void camimucalib_estimator::camimucalibManager::logData() {
                  << C0_t_Ck.x() << ", " << C0_t_Ck.y() << ", "<< C0_t_Ck.z() << std::endl;
 
     ///
-    repErr_csv << repErr << "\n";
+    residual_csv << residual << std::endl;
 }

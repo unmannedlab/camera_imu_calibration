@@ -79,6 +79,9 @@ namespace camimucalib_estimator {
         /// Boolean if we are initialized or not
         bool is_initialized_camimucalib = false;
 
+        /// G_T_I0;
+        Eigen::Matrix4d G_T_I0 = Eigen::Matrix4d::Identity();
+
         /// G_T_I1;
         Eigen::Matrix4d G_T_I1 = Eigen::Matrix4d::Identity();
 
@@ -129,13 +132,13 @@ namespace camimucalib_estimator {
         std::ofstream calib_extrinsic_csv;
         std::ofstream calib_dt_csv;
         std::ofstream visodom_csv;
-        std::ofstream repErr_csv;
+        std::ofstream residual_csv;
 
         /// Update flags
         bool did_update1 = false, did_update2 = false;
 
         /// Reprojection Error for verification
-        double repErr;
+        double residual;
     };
 }
 #endif //CAMIMUCALIB_ESTIMATOR_CAMIMUCALIBMANAGER_H

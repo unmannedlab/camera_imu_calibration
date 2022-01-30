@@ -96,7 +96,7 @@ int main (int argc, char** argv) {
             sys->feed_measurement_camera(time_lidar, image_in_color);
             cv::Mat image_out;
             cv::resize(image_in_color, image_out, cv::Size(), 0.5, 0.5);
-            cv::imshow("Image", image_in_color);
+            cv::imshow("Image", image_out);
             video.write(image_in_color);
 
             cv::waitKey(10);

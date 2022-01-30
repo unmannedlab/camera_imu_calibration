@@ -32,12 +32,12 @@ namespace camimucalib_estimator {
         /// Given lidar odometry, this will use them to update the state
         /// state: The current state of the system
         /// lodom: relative lidar odometry result that can be used for update
-        void updateImage2Image(State *current_state, relativePose lodom, bool &did_update);
+        double updateImage2Image(State *current_state, relativePose lodom, bool &did_update);
 
         /// Given lidar odometry, this will use them to update the state
         /// state: The current state of the system
         /// L0_T_Lk: global lidar odometry result that can be used for update
-        void updateImage2FirstImage(State *current_state, Eigen::Matrix4d L0_T_Lk, Eigen::Matrix4d G_T_I1, double timestamp, bool &did_update);
+        double updateImage2FirstImage(State *current_state, Eigen::Matrix4d L0_T_Lk, Eigen::Matrix4d G_T_I1, double timestamp, bool &did_update);
 
     protected:
 

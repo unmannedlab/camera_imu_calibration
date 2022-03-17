@@ -7,13 +7,11 @@
         <param name="topic_image"  type="string" value="/pylon_camera_node/image_raw" />
 
         <!-- bag parameters -->
-<!--         <param name = "path_bag" type="string" value="/home/smishr30/Downloads/calibcheckerboard1.bag"/> -->
-<!--         <param name = "path_bag" type="string" value="/home/usl/Downloads/cam_imu_calibration/calibcheckerboard2.bag"/> -->
-<!--         <param name = "path_bag" type="string" value="/home/smishr30/Downloads/cam_imu_lidar_calib_data/2022-01-28-15-11-20.bag"/> -->
-<!--         <param name = "path_bag" type="string" value="/home/smishr30/Downloads/cam_imu_lidar_calib_data/2022-01-28-15-15-06.bag"/> -->
-<!--         <param name = "path_bag" type="string" value="/home/smishr30/Downloads/cam_imu_lidar_calib_data/2022-01-28-15-20-21.bag"/> -->
-        <param name = "path_bag" type="string" value="/home/smishr30/Downloads/cam_imu_lidar_calib_data/2022-01-28-15-30-47.bag"/>
-
+<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-06-51.bag"/> -->
+<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-11-20.bag"/> -->
+<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-15-06.bag"/> -->
+        <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-20-21.bag"/>
+<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-30-47.bag"/> -->
 
         <param name="bag_start"   type="double" value="0" />
         <param name="bag_durr"    type="int"    value="-1" />
@@ -44,9 +42,11 @@
         <!-- Updater Parameters -->
         <!-- Chi2 Parameters -->
         <param name="updater_chi2_multiplier" type="int" value="1" />
+
         <!-- Update Noise (sigma) Params -->
         <param name="updater_translation_noise" type="double" value="0.05" />
         <param name="updater_rotation_noise" type="double" value="0.1" />
+        <param name="updater_pixel_noise" type="double" value="0.1" />
 
         <!-- State Initial Noise (sigma) Params -->
         <param name="state_init_x_noise" type="double" value="0.50" />
@@ -65,28 +65,28 @@
         <param name="calib_cameraimu_dt" type="double" value="0.0" />
 
         <!-- initial calibration file -->
-        <param name="init_calibration_result_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/I_T_C_init.txt"/>
-<!--         <param name="init_calibration_result_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/I_T_C_kalibr.txt"/> -->
-<!--         <param name="init_calibration_result_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/I_T_C_cincalib.txt"/> -->
+        <param name="init_calibration_result_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/I_T_C_init.txt"/>
+<!--         <param name="init_calibration_result_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/I_T_C_kalibr.txt"/> -->
+<!--         <param name="init_calibration_result_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/I_T_C_cincalib.txt"/> -->
 
         <!-- Camera Tracking Parameters -->
         <param name="checkerboard_dx" type="double" value="0.0715"/>
         <param name="checkerboard_dy" type="double" value="0.0715"/>
         <param name="checkerboard_rows" type="int" value="6"/>
         <param name="checkerboard_cols" type="int" value="7"/>
-        <param name="camera_calibration_file_path" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/pylon_calib.yaml"/>
+        <param name="camera_calibration_file_path" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/pylon_calib.yaml"/>
 
         <!-- output filenames -->
-        <param name="camimu_trajectory_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/camimucalib_trajectory.csv"/>
-        <param name="camimu_bias_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/camimucalib_bias.csv"/>
-        <param name="camimu_velocity_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/camimucalib_velocity.csv"/>
-        <param name="camimu_calib_extrinsic_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/camimu_calib_extrinsic.csv"/>
-        <param name="camimu_calib_dt_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/camimu_calib_dt.csv"/>
-        <param name="camerapose_trajectory_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/camerapose_trajectory.csv"/>
-        <param name="reprojection_error_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/reprojection_error.csv"/>
+        <param name="camimu_trajectory_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/camimucalib_trajectory.csv"/>
+        <param name="camimu_bias_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/camimucalib_bias.csv"/>
+        <param name="camimu_velocity_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/camimucalib_velocity.csv"/>
+        <param name="camimu_calib_extrinsic_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/camimu_calib_extrinsic.csv"/>
+        <param name="camimu_calib_dt_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/camimu_calib_dt.csv"/>
+        <param name="camerapose_trajectory_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/camerapose_trajectory.csv"/>
+        <param name="reprojection_error_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/reprojection_error.csv"/>
 
         <!-- output -->
-        <param name="calibration_result_filename" type="string" value="/home/smishr30/catkin_ws/src/camera_imu_calibration/data/I_T_C.txt"/>
+        <param name="calibration_result_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_calibration/data/I_T_C.txt"/>
 
     </node>
 

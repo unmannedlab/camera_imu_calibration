@@ -51,6 +51,7 @@ namespace camimucalib_estimator {
         ROS_INFO_STREAM("Reading Rotation and Noise Update");
         nh.param<double>("updater_rotation_noise", params.updaterOptions.noise_rotation, params.updaterOptions.noise_rotation);
         nh.param<double>("updater_translation_noise", params.updaterOptions.noise_translation, params.updaterOptions.noise_translation);
+        nh.param<double>("updater_pixel_noise", params.updaterOptions.noise_pixel, params.updaterOptions.noise_pixel);
 
         /// Global gravity
         ROS_INFO_STREAM("Reading Gravity");

@@ -111,10 +111,11 @@ void camimucalib_estimator::camimucalibManager::feed_measurement_camera(double t
         if(!is_initialized_camimucalib)
             return;
     }
-
-    bool boarddetected = cameraPoseTracker->feedImage(timestamp, image_in);
-
+    std::cout << "Crashed here 1." << std::endl;
+    bool boarddetected = cameraPoseTracker->feedImage(timestamp, image_in, objectpoints_c0, imagepoints);
+    std::cout << "Crashed here 2." << std::endl;
     bool did_propagate_update = do_propagate_update(timestamp, boarddetected);
+    std::cout << "Crashed here 3." << std::endl;
 
     if(state->_clones_IMU.size() == 1) {
         /// G_T_I1
@@ -125,6 +126,7 @@ void camimucalib_estimator::camimucalibManager::feed_measurement_camera(double t
         G_T_I1.block(0, 0, 3, 3) = G_R_I1;
         G_T_I1.block(0, 3, 3, 1) = G_t_I1;
     }
+    std::cout << "Crashed here 4." << std::endl;
 
     Eigen::Matrix4d G_T_Ik = Eigen::Matrix4d::Identity();
     Eigen::Matrix3d Ik_R_G = camimucalib_core::quat_2_Rot(state->_imu->quat());
@@ -141,8 +143,10 @@ void camimucalib_estimator::camimucalibManager::feed_measurement_camera(double t
     I_T_C.block(0, 3, 3, 1) = I_t_C;
     residual = cameraPoseTracker->checkReprojections(I_T_C, I0_T_Ik);
     std::cout << "Residual: " << residual << std::endl;
+    std::cout << "Crashed here 5." << std::endl;
     /// Printing for debug
     logData();
+    std::cout << "Crashed here 6." << std::endl;
 }
 
 bool camimucalib_estimator::camimucalibManager::do_propagate_update(double timestamp, bool boarddetected) {
@@ -163,19 +167,18 @@ bool camimucalib_estimator::camimucalibManager::do_propagate_update(double times
         printf(YELLOW "[camimucalib_estimator::camimucalibManager::do_propagate_update] state->_clones_IMU.size() must be > 2\n");
         return false;
     }
-    std::cout << "Board Detected ?: " << boarddetected << std::endl;
+
     if (boarddetected) {
         /// Marginalize the oldest clone if needed
-        if(did_update1 && did_update2) {
+        if(did_update3) {
             StateHelper::marginalize_old_clone(state);
         }
-        relativePose rP = cameraPoseTracker->getRelativePose();
-        double residua1 = updaterCameraTracking->updateImage2Image(state, rP, did_update1);
-        Eigen::Matrix4d Im1_T_Imk = cameraPoseTracker->getCameraPose().pose;
-        double residua2 = updaterCameraTracking->updateImage2FirstImage(state, Im1_T_Imk, G_T_I1, timestamp, did_update2);
-        if(did_update1 && did_update2) {
-//            residual = residua1 + residua2;
-//            std::cout << YELLOW << "Current Residual: " << residua1+residua2 << std::endl;
+//        relativePose rP = cameraPoseTracker->getRelativePose();
+//        double residual1 = updaterCameraTracking->updateImage2Image(state, rP, did_update1);
+//        Eigen::Matrix4d C1_T_Ck = cameraPoseTracker->getCameraPose().pose;
+//        double residual2 = updaterCameraTracking->updateImage2FirstImage(state, C1_T_Ck, G_T_I0, timestamp, did_update2);
+        double residual3 = updaterCameraTracking->updatePixelBased(state, G_T_I0, imagepoints, objectpoints_c0, timestamp, did_update3);
+        if(did_update3) {
             return true;
         }
     }
@@ -185,6 +188,9 @@ bool camimucalib_estimator::camimucalibManager::do_propagate_update(double times
 void camimucalib_estimator::camimucalibManager::logData() {
 //    std::cout << YELLOW << "Started Printing" << std::endl;
     Pose* calib = state->_calib_CAMERAtoIMU;
+    Eigen::Matrix3d R_c = camimucalib_core::quat_2_Rot(calib->quat());
+    Eigen::Vector3d euler_c = R_c.eulerAngles(2, 1, 0);
+    Eigen::Vector3d p_c = calib->pos();
     Eigen::Matrix3d I_R_G = camimucalib_core::quat_2_Rot(state->_imu->quat());
     Eigen::Matrix3d G_R_I = I_R_G.transpose();
     Eigen::Quaterniond G_quat_I(G_R_I);
@@ -219,8 +225,8 @@ void camimucalib_estimator::camimucalibManager::logData() {
     std::vector<Type*> statevars_calib_extrinsic;
     statevars_calib_extrinsic.push_back(state->_calib_CAMERAtoIMU);
     Eigen::Matrix<double, 6, 6> covariance_calib_extrinsic = StateHelper::get_marginal_covariance(state, statevars_calib_extrinsic);
-    calib_extrinsic_csv << calib->quat()(0) << "," << calib->quat()(1) << ", " << calib->quat()(2) << ", " << calib->quat()(3) << ", "
-                        << calib->pos()(0) << "," << calib->pos()(1) << "," << calib->pos()(2) << ", "
+    calib_extrinsic_csv << euler_c.x() << "," << euler_c.y() << ", " << euler_c.z() << ", "
+                        << p_c.x() << "," << p_c.y() << "," << p_c.z() << ", "
                         << sqrt(covariance_calib_extrinsic(0, 0)) << ", " << sqrt(covariance_calib_extrinsic(1, 1)) << ", " << sqrt(covariance_calib_extrinsic(2, 2)) << ", "
                         << sqrt(covariance_calib_extrinsic(3, 3)) << ", " << sqrt(covariance_calib_extrinsic(4, 4)) << ", " << sqrt(covariance_calib_extrinsic(5, 5)) << std::endl;
 

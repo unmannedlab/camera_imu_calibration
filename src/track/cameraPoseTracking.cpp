@@ -22,10 +22,7 @@ namespace camimucalib_core {
                 object_points.emplace_back(cv::Point3f(i*dx, j*dy, 0.0));
 
         first_frame = true;
-        camera2ros << 0,  0, 1, 0,
-                     -1,  0, 0, 0,
-                      0, -1, 0, 0,
-                      0,  0, 0, 1;
+
         C0_T_Ck_1 = Eigen::Matrix4d::Identity();
     }
 
@@ -50,23 +47,32 @@ namespace camimucalib_core {
         fs_cam_config["fy"] >> K.at<double>(1, 1);
         fs_cam_config["cx"] >> K.at<double>(0, 2);
         fs_cam_config["cy"] >> K.at<double>(1, 2);
-        C_T_W_eig = Eigen::Matrix4d::Identity();
-        W_T_C_eig = Eigen::Matrix4d::Identity();
+        C_T_B_eig = Eigen::Matrix4d::Identity();
+        B_T_C_eig = Eigen::Matrix4d::Identity();
     }
 
-    bool cameraPoseTracking::feedImage(double timestamp, cv::Mat input_image, Eigen::Matrix4d pose_predict) {
+    bool cameraPoseTracking::feedImage(double timestamp, cv::Mat input_image,
+                                       std::vector<cv::Point3f> &objectpoints_C0,
+                                       std::vector<cv::Point2f> &imagepoints) {
         current_timestamp = timestamp;
         image_in_for_poseestimation = input_image.clone();
         image_in_for_visualization = input_image;
         cv::cvtColor(image_in_for_poseestimation, image_in_for_poseestimation, cv::COLOR_BGR2GRAY);
-        bool boardDetectedInCam = cv::findChessboardCorners(image_in_for_poseestimation, cv::Size(checkerboard_cols, checkerboard_rows),
+        image_points.clear();
+        imagepoints.clear();
+        bool boardDetectedInCam = cv::findChessboardCorners(image_in_for_poseestimation,
+                                                            cv::Size(checkerboard_cols, checkerboard_rows),
                                                             image_points);
-        cv::drawChessboardCorners(image_in_for_visualization, cv::Size(checkerboard_cols, checkerboard_rows), image_points, boardDetectedInCam);
+        image_points_undistorted.clear();
+        cv::undistortPoints(image_points, image_points_undistorted, projection_matrix, distCoeff);
+        imagepoints = image_points_undistorted;
+        cv::drawChessboardCorners(image_in_for_visualization, cv::Size(checkerboard_cols, checkerboard_rows),
+                                  image_points, boardDetectedInCam);
         if(boardDetectedInCam) {
-//            cv::cornerSubPix(image_in_for_poseestimation, image_points, cv::Size(11, 11),
-//                             cv::Size(-1, -1), cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
             assert(image_points.size() == object_points.size());
             estimateCameraPose();
+            objectpoints_C0.clear();
+            objectpoints_C0 = object_points_C0;
         }
         return boardDetectedInCam;
     }
@@ -77,7 +83,7 @@ namespace camimucalib_core {
 
     double cameraPoseTracking::visualizeImageProjections(cv::Mat rvec, cv::Mat tvec) {
         std::vector<cv::Point2f> projected_points;
-        cv::projectPoints(object_points, rvec, tvec, projection_matrix, distCoeff, projected_points, cv::noArray());
+        cv::projectPoints(object_points_C0, rvec, tvec, projection_matrix, distCoeff, projected_points, cv::noArray());
 
         double error = 0;
         for(int i = 0; i < projected_points.size(); i++){
@@ -94,22 +100,32 @@ namespace camimucalib_core {
 
     void cameraPoseTracking::estimateCameraPose() {
         solvePnPProblem();
-//        visualizeImageProjections(rvec, tvec);
 
-        cv::Rodrigues(rvec, C_R_W);
-        cv::cv2eigen(C_R_W, C_R_W_eig);
-        C_t_W_eig = Eigen::Vector3d(tvec.at<double>(0),tvec.at<double>(1),tvec.at<double>(2));
+        cv::Rodrigues(rvec, C_R_B);
+        cv::cv2eigen(C_R_B, C_R_B_eig);
+        C_t_B_eig = Eigen::Vector3d(tvec.at<double>(0), tvec.at<double>(1), tvec.at<double>(2));
 
-        C_T_W_eig.block(0, 0, 3, 3) = C_R_W_eig;
-        C_T_W_eig.block(0, 3, 3, 1) = C_t_W_eig;
+        C_T_B_eig.block(0, 0, 3, 3) = C_R_B_eig;
+        C_T_B_eig.block(0, 3, 3, 1) = C_t_B_eig;
 
-        W_T_C_eig = C_T_W_eig.inverse();
+        B_T_C_eig = C_T_B_eig.inverse();
 
         if (first_frame) {
-            W_T_C_eig_first = W_T_C_eig;
+            B_T_C_eig_first = B_T_C_eig;
+            Eigen::Matrix3d W_R_C0 = B_T_C_eig_first.block(0, 0, 3, 3);
+            Eigen::Vector3d W_t_C0 = B_T_C_eig_first.block(0, 3, 3, 1);
+            Eigen::Matrix3d C0_R_W = W_R_C0.transpose();
+            Eigen::Vector3d C0_t_W = -C0_R_W*W_t_C0;
+            object_points_C0.clear();
+            for (int i = 0; i < object_points.size(); ++i) {
+                Eigen::Vector3d X_B = Eigen::Vector3d(object_points[i].x, object_points[i].y, object_points[i].z);
+                Eigen::Vector3d X_C0 = C0_R_W*X_B + C0_t_W;
+                cv::Point3d X_C0_cv = cv::Point3d(X_C0.x(), X_C0.y(), X_C0.z());
+                object_points_C0.push_back(X_C0_cv);
+            }
         }
 
-        C0_T_Ck = camera2ros*W_T_C_eig_first.inverse()*W_T_C_eig*camera2ros.inverse();
+        C0_T_Ck = B_T_C_eig_first.inverse() * B_T_C_eig;
         Eigen::Matrix4d deltaPose = C0_T_Ck_1.inverse()*C0_T_Ck;
 
         if(!first_frame) {
@@ -127,17 +143,17 @@ namespace camimucalib_core {
     }
 
     double cameraPoseTracking::checkReprojections(Eigen::Matrix4d I_T_C, Eigen::Matrix4d I0_T_Ik) {
-        Eigen::Matrix4d w_T_c = W_T_C_eig_first*camera2ros.inverse()*I_T_C.inverse()*I0_T_Ik*I_T_C*camera2ros;
-        Eigen::Matrix4d c_T_w = w_T_c.inverse();
-        Eigen::Matrix3d c_R_w = c_T_w.block(0, 0, 3, 3);
-        cv::Mat c_R_w_cv, rvec;
-        Eigen::Vector3d c_t_w = c_T_w.block(0, 3, 3, 1);
-        cv::Mat c_t_w_cv;
-        cv::eigen2cv(c_R_w, c_R_w_cv);
-        cv::eigen2cv(c_t_w,c_t_w_cv);
-        cv::Rodrigues(c_R_w_cv, rvec);
+        Eigen::Matrix4d b_T_c = I_T_C.inverse() * I0_T_Ik * I_T_C;
+        Eigen::Matrix4d c_T_b = b_T_c.inverse();
+        Eigen::Matrix3d c_R_b = c_T_b.block(0, 0, 3, 3);
+        cv::Mat c_R_b_cv, rvec;
+        Eigen::Vector3d c_t_b = c_T_b.block(0, 3, 3, 1);
+        cv::Mat c_t_b_cv;
+        cv::eigen2cv(c_R_b, c_R_b_cv);
+        cv::eigen2cv(c_t_b, c_t_b_cv);
+        cv::Rodrigues(c_R_b_cv, rvec);
 
-        double reperr = visualizeImageProjections(rvec, c_t_w_cv);
+        double reperr = visualizeImageProjections(rvec, c_t_b_cv);
         cumulative_rep_err += reperr;
         cv::putText(image_in_for_visualization, //target image
                     "Current Rep Error: " + std::to_string(reperr), //text

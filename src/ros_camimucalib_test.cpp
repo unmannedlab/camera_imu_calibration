@@ -71,7 +71,7 @@ int main (int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    cv::VideoWriter video("/home/smishr30/Downloads/output_video_cincalib/outcpp.avi", cv::VideoWriter::fourcc('M','J','P','G'), 10, cv::Size(1920,1200));
+//    cv::VideoWriter video("/home/smishr30/Downloads/output_video_cincalib/outcpp.avi", cv::VideoWriter::fourcc('M','J','P','G'), 10, cv::Size(1920,1200));
     for (const rosbag::MessageInstance& m : view) {
         if (!ros::ok())
             break;
@@ -97,34 +97,30 @@ int main (int argc, char** argv) {
             cv::Mat image_out;
             cv::resize(image_in_color, image_out, cv::Size(), 0.5, 0.5);
             cv::imshow("Image", image_out);
-            video.write(image_in_color);
+//            video.write(image_in_color);
 
             cv::waitKey(10);
         }
     }
-    video.release();
+//    video.release();
 
     ROS_INFO_STREAM("Reached end of bag");
-    /// Write the final I_T_C1 to a text file
-    Eigen::Matrix4d C1_T_C2;
-    C1_T_C2 << 0,  0, 1, 0,
-              -1,  0, 0, 0,
-               0, -1, 0, 0,
-               0,  0, 0, 1;
+    /// Write the final I_T_C to a text file
     camimucalib_estimator::State* state = sys->get_state();
     Pose *calibration = state->_calib_CAMERAtoIMU;
-    Eigen::Matrix3d I_R_C1 = calibration->Rot();
-    Eigen::Vector3d I_t_C1 = calibration->pos();
-    Eigen::Matrix4d I_T_C1 = Eigen::Matrix4d::Identity();
-    I_T_C1.block(0, 0, 3, 3) = I_R_C1;
-    I_T_C1.block(0, 3, 3, 1) = I_t_C1;
-    Eigen::Matrix4d I_T_C2 = I_T_C1*C1_T_C2;
-//    std::cout << "I_T_C1: \n" << I_T_C1 << std::endl;
-//    std::cout << "I_T_C: \n" << I_T_C2 << std::endl;
+    Eigen::Matrix3d I_R_C = calibration->Rot();
+    Eigen::Vector3d I_t_C = calibration->pos();
+    Eigen::Matrix4d I_T_C = Eigen::Matrix4d::Identity();
+    I_T_C.block(0, 0, 3, 3) = I_R_C;
+    I_T_C.block(0, 3, 3, 1) = I_t_C;
     std::cout << "Writing KF calibration result to: " << params.calibration_result_filename << std::endl;
     std::ofstream result_calibration;
     result_calibration.open(params.calibration_result_filename.c_str());
-    result_calibration << I_T_C1;
+    result_calibration << I_T_C;
     result_calibration.close();
+    std::cout << "Calibration Euler Angle [deg]: " << I_R_C.eulerAngles(2, 1, 0).transpose()*180/M_PI << std::endl;
+    std::cout << "Calibration Translation [m]: " << I_t_C.transpose() << std::endl;
+    std::cout << "I_T_C: " << std::endl;
+    std::cout << I_T_C << std::endl;
     return EXIT_SUCCESS;
 }

@@ -1,19 +1,19 @@
 clear all;
 clc;
 data_ext_calib = csvread('camimu_calib_extrinsic.csv');
-quat = data_ext_calib(:, 1:4);
-xyz = data_ext_calib(:, 5:7);
-sigma_xyz = data_ext_calib(:, 11:13);
-sigma_rxryrz = data_ext_calib(:, 8:10)*180/pi;
+eul_xyz = data_ext_calib(:, 1:3)*180/pi;
+t_xyz = data_ext_calib(:, 4:6);
+sigma_rxryrz = data_ext_calib(:, 7:9)*180/pi;
+sigma_txyz = data_ext_calib(:, 10:12);
 %%
 figure('Name','Calibration XYZ KF','NumberTitle','off');
 subplot(311)
-plot(xyz(:,1),  '.', 'LineWidth', 3);
+plot(t_xyz(:,1),  '.', 'LineWidth', 3);
 %hold off;
 hold on;
-plot(xyz(:,1) + sigma_xyz(:,1), '--r', 'LineWidth', 3);
+plot(t_xyz(:,1) + sigma_txyz(:,1), '--r', 'LineWidth', 3);
 hold on;
-plot(xyz(:,1) - sigma_xyz(:,1), '--r', 'LineWidth', 3);
+plot(t_xyz(:,1) - sigma_txyz(:,1), '--r', 'LineWidth', 3);
 hold off;
 ylabel('Calib X [m]','fontweight','bold','fontsize',16);
 grid;
@@ -21,12 +21,12 @@ title('Calib X [m]','fontweight','bold','fontsize',16);
 xlabel('Time [s]','fontweight','bold','fontsize',16)
 
 subplot(312)
-plot(xyz(:,2),  '.', 'LineWidth', 3);
+plot(t_xyz(:,2),  '.', 'LineWidth', 3);
 %hold off;
 hold on;
-plot(xyz(:,2) + sigma_xyz(:,2), '--r', 'LineWidth', 3);
+plot(t_xyz(:,2) + sigma_txyz(:,2), '--r', 'LineWidth', 3);
 hold on;
-plot(xyz(:,2) - sigma_xyz(:,2), '--r', 'LineWidth', 3);
+plot(t_xyz(:,2) - sigma_txyz(:,2), '--r', 'LineWidth', 3);
 hold off;
 ylabel('Calib Y [m]','fontweight','bold','fontsize',16);
 grid;
@@ -34,12 +34,12 @@ title('Calib Y [m]','fontweight','bold','fontsize',16);
 xlabel('Time [s]','fontweight','bold','fontsize',16);
 
 subplot(313)
-plot(xyz(:,3),  '.', 'LineWidth', 3);
+plot(t_xyz(:,3),  '.', 'LineWidth', 3);
 %hold off;
 hold on;
-plot(xyz(:,3) + sigma_xyz(:,3), '--r', 'LineWidth', 3);
+plot(t_xyz(:,3) + sigma_txyz(:,3), '--r', 'LineWidth', 3);
 hold on;
-plot(xyz(:,3) - sigma_xyz(:,3), '--r', 'LineWidth', 3);
+plot(t_xyz(:,3) - sigma_txyz(:,3), '--r', 'LineWidth', 3);
 hold off;
 ylabel('Calib Z [m]','fontweight','bold','fontsize',16);
 grid;
@@ -48,14 +48,7 @@ xlabel('Time [s]','fontweight','bold','fontsize',16);
 
 
 %%
-eulerangleDegrees = [];
-for i=1:length(quat)
-    eulerAngle = quaternion2euler([quat(i, 4), quat(i, 1), quat(i, 2), quat(i, 3)]);
-    euler_x = eulerAngle(1)*180/pi;
-    euler_y = eulerAngle(2)*180/pi;
-    euler_z = eulerAngle(3)*180/pi;
-    eulerangleDegrees = [eulerangleDegrees; [euler_x, euler_y, euler_z]];
-end
+eulerangleDegrees = eul_xyz;
 eulerangleDegreesMinus = eulerangleDegrees - sigma_rxryrz;
 eulerangleDegreesPlus = eulerangleDegrees + sigma_rxryrz;
 

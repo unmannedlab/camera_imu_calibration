@@ -38,7 +38,7 @@ namespace camimucalib_core {
                               int &image_height, int &image_width,
                               cv::Mat &D, cv::Mat &K);
         bool feedImage(double timestamp, cv::Mat input_image,
-                       Eigen::Matrix4d pose_predict = Eigen::Matrix4d::Identity());
+                       std::vector<cv::Point3f> &objectpoints_C0, std::vector<cv::Point2f> &imagepoints);
         void solvePnPProblem();
         double visualizeImageProjections(cv::Mat rvec, cv::Mat tvec);
         void estimateCameraPose();
@@ -55,21 +55,22 @@ namespace camimucalib_core {
         int image_height, image_width;
 
         std::vector<cv::Point2f> image_points;
+        std::vector<cv::Point2f> image_points_undistorted;
         std::vector<cv::Point3f> object_points;
+        std::vector<cv::Point3f> object_points_C0;
 
         double dx, dy;
         int checkerboard_rows, checkerboard_cols;
 
         cv::Mat tvec, rvec;
-        cv::Mat C_R_W;
+        cv::Mat C_R_B;
 
-        Eigen::Matrix3d C_R_W_eig;
-        Eigen::Vector3d C_t_W_eig;
-        Eigen::Matrix4d C_T_W_eig;
-        Eigen::Matrix4d W_T_C_eig;
-        Eigen::Matrix4d W_T_C_eig_first;
+        Eigen::Matrix3d C_R_B_eig;
+        Eigen::Vector3d C_t_B_eig;
+        Eigen::Matrix4d C_T_B_eig;
+        Eigen::Matrix4d B_T_C_eig;
+        Eigen::Matrix4d B_T_C_eig_first;
 
-        Eigen::Matrix4d camera2ros;
         std::string cam_config_file_path;
 
         bool first_frame;

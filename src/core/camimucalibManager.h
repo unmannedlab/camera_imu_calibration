@@ -135,10 +135,14 @@ namespace camimucalib_estimator {
         std::ofstream residual_csv;
 
         /// Update flags
-        bool did_update1 = false, did_update2 = false;
+        bool did_update1 = false, did_update2 = false, did_update3 = false;
 
         /// Reprojection Error for verification
         double residual;
+
+        /// For pixel based update
+        std::vector<cv::Point2f> imagepoints;
+        std::vector<cv::Point3f> objectpoints_c0;
     };
 }
 #endif //CAMIMUCALIB_ESTIMATOR_CAMIMUCALIBMANAGER_H

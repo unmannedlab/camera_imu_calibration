@@ -14,6 +14,8 @@ namespace camimucalib_estimator {
       /// Noise levels
       double noise_translation  = 0.1;
       double noise_rotation = 0.1;
+      double noise_pixel = 0.05;
+
       /// Do chi2 check?
       bool do_chi2_check = true;
 

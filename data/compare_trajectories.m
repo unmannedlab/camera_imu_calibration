@@ -33,14 +33,14 @@ for i=1:length(quat_camera_traj)
   quaternion = [quat_camera_traj(i,4), quat_camera_traj(i,1), 
                 quat_camera_traj(i,2), quat_camera_traj(i,3)];
   euler_camera_traj = [euler_camera_traj; EulerFromQuat(quaternion)*180/pi];
-endfor
+end
 
 euler_camera_traj_imu_smoothed = [];
 for i=1:length(quat_camera_traj_imu_smoothed)
   quaternion = [quat_camera_traj_imu_smoothed(i,4), quat_camera_traj_imu_smoothed(i,1), 
                 quat_camera_traj_imu_smoothed(i,2), quat_camera_traj_imu_smoothed(i,3)];
   euler_camera_traj_imu_smoothed = [euler_camera_traj_imu_smoothed; EulerFromQuat(quaternion)*180/pi];
-endfor
+end
 
 figure(2)
 subplot(311)

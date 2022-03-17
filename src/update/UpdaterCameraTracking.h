@@ -6,6 +6,9 @@
 #define CAMIMUCALIB_ESTIMATOR_UPDATERCAMERATRACKING_H
 
 #include <Eigen/Eigen>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/eigen.hpp>
+
 #include "state/State.h"
 #include "state/StateHelper.h"
 #include "utils/quat_ops.h"
@@ -29,15 +32,22 @@ namespace camimucalib_estimator {
             }
         }
 
-        /// Given lidar odometry, this will use them to update the state
+        /// Given camera odometry, this will use them to update the state
         /// state: The current state of the system
         /// lodom: relative lidar odometry result that can be used for update
         double updateImage2Image(State *current_state, relativePose lodom, bool &did_update);
 
-        /// Given lidar odometry, this will use them to update the state
+        /// Given camera odometry, this will use them to update the state
         /// state: The current state of the system
-        /// L0_T_Lk: global lidar odometry result that can be used for update
+        /// L0_T_Lk: global camera odometry result that can be used for update
         double updateImage2FirstImage(State *current_state, Eigen::Matrix4d L0_T_Lk, Eigen::Matrix4d G_T_I1, double timestamp, bool &did_update);
+
+        /// Given camera pixel detections, this will use them to update the state
+        /// state: The current state of the system
+        double updatePixelBased(State *current_state, Eigen::Matrix4d G_T_I0,
+                                std::vector<cv::Point2f> pixel_measurements,
+                                std::vector<cv::Point3f> object_points_c0,
+                                double timestamp, bool &did_update);
 
     protected:
 

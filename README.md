@@ -13,3 +13,5 @@ For calculating the Jacobians, I have used the notations and conventions adopted
 [ROS](http://wiki.ros.org/noetic/Installation/Ubuntu)
 
 This code works on Ubuntu 20.04 and uses the ROS framework for message passing. Standalone installation of OpenCV may not be necessary as this package uses  OpenCV that ships with ROS. 
+
+This code base is missing the rotation initialization code that determines I_R_C. If one can provide a decent I_R_C initialization, this will work fairly well. I'll add the rotation initialization code later.

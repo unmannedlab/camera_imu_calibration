@@ -19,9 +19,9 @@ namespace camimucalib_estimator {
         nh.param<bool>("use_fej", params.state_options.do_fej, params.state_options.do_fej);
         nh.param<bool>("use_imuavg", params.state_options.imu_avg, params.state_options.imu_avg);
         nh.param<bool>("use_rk4int", params.state_options.use_rk4_integration, params.state_options.use_rk4_integration);
-        nh.param<bool>("calib_camera_timeoffset", params.state_options.do_calib_camera_timeoffset, params.state_options.do_calib_camera_timeoffset);
+        nh.param<bool>("do_calib_camera_imu_timeoffset", params.state_options.do_calib_camera_imu_timeoffset, params.state_options.do_calib_camera_imu_timeoffset);
+        nh.param<bool>("do_calib_camera_imu_extrinsic", params.state_options.do_calib_camera_imu_extrinsic, params.state_options.do_calib_camera_imu_extrinsic);
         nh.param<int>("max_clones", params.state_options.max_clone_size, params.state_options.max_clone_size);
-        nh.param<bool>("calib_extrinsics", params.state_options.do_calib_extrinsic, params.state_options.do_calib_extrinsic);
         nh.param<double>("state_init_x_noise", params.state_options.trans_x_noise, params.state_options.trans_x_noise);
         nh.param<double>("state_init_y_noise", params.state_options.trans_y_noise, params.state_options.trans_y_noise);
         nh.param<double>("state_init_z_noise", params.state_options.trans_z_noise, params.state_options.trans_z_noise);

@@ -543,7 +543,7 @@ void StateHelper::augment_clone(State *state, Eigen::Matrix<double, 3, 1> last_w
     // If we are doing time calibration, then our clones are a function of the time offset
     // Logic is based on Mingyang Li and Anastasios I. Mourikis paper:
     // http://journals.sagepub.com/doi/pdf/10.1177/0278364913515286
-    if (state->_options.do_calib_camera_timeoffset) {
+    if (state->_options.do_calib_camera_imu_timeoffset) {
         // Jacobian to augment by
         Eigen::Matrix<double, 6, 1> dnc_dt = Eigen::MatrixXd::Zero(6, 1);
         dnc_dt.block(0, 0, 3, 1) = last_w;

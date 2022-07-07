@@ -143,6 +143,9 @@ namespace camimucalib_estimator {
         /// For pixel based update
         std::vector<cv::Point2f> imagepoints;
         std::vector<cv::Point3f> objectpoints_c0;
+
+        ///
+        int number_of_frames = 0;
     };
 }
 #endif //CAMIMUCALIB_ESTIMATOR_CAMIMUCALIBMANAGER_H

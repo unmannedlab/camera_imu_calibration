@@ -22,13 +22,13 @@ namespace camimucalib_estimator {
         bool use_rk4_integration = true;
 
         /// Bool to determine whether or not to calibrate Camera to IMU time offset
-        bool do_calib_camera_timeoffset = false;
+        bool do_calib_camera_imu_timeoffset = false;
+
+        /// Bool to determine whether or not to calibrate Camera to IMU (I_R_L (I_q_L), I_t_L) extrinsics
+        bool do_calib_camera_imu_extrinsic = false;
 
         /// Max clone size of sliding window
         int max_clone_size = 11;
-
-        /// Bool to determine whether or not to calibrate Camera to IMU (I_R_L (I_q_L), I_t_L) extrinsics
-        bool do_calib_extrinsic = false;
 
         /// Initial Noise
         double rot_x_noise = 0.2;
@@ -44,9 +44,9 @@ namespace camimucalib_estimator {
             printf("\t- use_fej: %d\n", do_fej);
             printf("\t- use_imuavg: %d\n", imu_avg);
             printf("\t- use_rk4int: %d\n", use_rk4_integration);
-            printf("\t- do_calib_camera_timeoffset?: %d\n", do_calib_camera_timeoffset);
+            printf("\t- do_calib_camera_imu_timeoffset?: %d\n", do_calib_camera_imu_timeoffset);
             printf("\t- max_clone_size: %d\n", max_clone_size);
-            printf("\t- do_calib_extrinsic?: %d\n", do_calib_extrinsic);
+            printf("\t- do_calib_camera_imu_extrinsic?: %d\n", do_calib_camera_imu_extrinsic);
             printf("\t- rot_x_noise: %f\n", rot_x_noise);
             printf("\t- rot_y_noise: %f\n", rot_y_noise);
             printf("\t- rot_z_noise: %f\n", rot_z_noise);

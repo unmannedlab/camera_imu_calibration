@@ -44,7 +44,7 @@ list(APPEND thirdparty_libraries
         ${Boost_LIBRARIES}
         ${OpenCV_LIBRARIES}
         ${catkin_LIBRARIES}
-        )
+)
 
 ##################################################
 # Make the core library
@@ -54,7 +54,7 @@ add_library(camimucalib_lib SHARED
             src/state/State.cpp
             src/state/StateHelper.cpp
             src/state/Propagator.cpp
-        src/track/cameraPoseTracking.cpp
+            src/track/cameraPoseTracking.cpp
             src/update/UpdaterCameraTracking.cpp
             src/core/camimucalibManager.cpp)
 

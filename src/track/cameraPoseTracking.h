@@ -44,7 +44,7 @@ namespace camimucalib_core {
         void estimateCameraPose();
         Odom getCameraPose();
         relativePose getRelativePose();
-        double checkReprojections(Eigen::Matrix4d I_T_C, Eigen::Matrix4d I0_T_Ik);
+        double checkReprojections(Eigen::Matrix4d I_T_C, Eigen::Matrix4d I0_T_Ik, int number_of_frames);
 
     private:
         cv::Mat image_in_for_poseestimation;

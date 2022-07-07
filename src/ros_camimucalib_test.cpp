@@ -72,6 +72,7 @@ int main (int argc, char** argv) {
     }
 
 //    cv::VideoWriter video("/home/smishr30/Downloads/output_video_cincalib/outcpp.avi", cv::VideoWriter::fourcc('M','J','P','G'), 10, cv::Size(1920,1200));
+    int image_counter = 0;
     for (const rosbag::MessageInstance& m : view) {
         if (!ros::ok())
             break;
@@ -90,15 +91,17 @@ int main (int argc, char** argv) {
         if (s_image != nullptr && m.getTopic() == topic_image) {
             double time_lidar = (*s_image).header.stamp.toSec();
             cv::Mat image_in = cv_bridge::toCvShare(s_image, "mono8")->image;
+            image_counter++;
             cv::Mat image_in_color;
             cv::cvtColor(image_in, image_in_color, cv::COLOR_GRAY2BGR);
 //            ROS_INFO_STREAM("Feeding camera measurement");
             sys->feed_measurement_camera(time_lidar, image_in_color);
+
             cv::Mat image_out;
             cv::resize(image_in_color, image_out, cv::Size(), 0.5, 0.5);
             cv::imshow("Image", image_out);
 //            video.write(image_in_color);
-
+            cv::imwrite("/home/usl/Downloads/output-files/"+std::to_string(image_counter)+".png", image_in_color);
             cv::waitKey(10);
         }
     }

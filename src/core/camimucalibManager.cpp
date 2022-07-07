@@ -111,11 +111,11 @@ void camimucalib_estimator::camimucalibManager::feed_measurement_camera(double t
         if(!is_initialized_camimucalib)
             return;
     }
-    std::cout << "Crashed here 1." << std::endl;
     bool boarddetected = cameraPoseTracker->feedImage(timestamp, image_in, objectpoints_c0, imagepoints);
-    std::cout << "Crashed here 2." << std::endl;
     bool did_propagate_update = do_propagate_update(timestamp, boarddetected);
-    std::cout << "Crashed here 3." << std::endl;
+
+    number_of_frames++;
+
 
     if(state->_clones_IMU.size() == 1) {
         /// G_T_I1
@@ -126,7 +126,6 @@ void camimucalib_estimator::camimucalibManager::feed_measurement_camera(double t
         G_T_I1.block(0, 0, 3, 3) = G_R_I1;
         G_T_I1.block(0, 3, 3, 1) = G_t_I1;
     }
-    std::cout << "Crashed here 4." << std::endl;
 
     Eigen::Matrix4d G_T_Ik = Eigen::Matrix4d::Identity();
     Eigen::Matrix3d Ik_R_G = camimucalib_core::quat_2_Rot(state->_imu->quat());
@@ -141,12 +140,9 @@ void camimucalib_estimator::camimucalibManager::feed_measurement_camera(double t
     Eigen::Matrix4d I_T_C = Eigen::Matrix4d::Identity();
     I_T_C.block(0, 0, 3, 3) = I_R_C;
     I_T_C.block(0, 3, 3, 1) = I_t_C;
-    residual = cameraPoseTracker->checkReprojections(I_T_C, I0_T_Ik);
-    std::cout << "Residual: " << residual << std::endl;
-    std::cout << "Crashed here 5." << std::endl;
+    residual = cameraPoseTracker->checkReprojections(I_T_C, I0_T_Ik, number_of_frames);
     /// Printing for debug
     logData();
-    std::cout << "Crashed here 6." << std::endl;
 }
 
 bool camimucalib_estimator::camimucalibManager::do_propagate_update(double timestamp, bool boarddetected) {
@@ -173,14 +169,21 @@ bool camimucalib_estimator::camimucalibManager::do_propagate_update(double times
         if(did_update3) {
             StateHelper::marginalize_old_clone(state);
         }
-//        relativePose rP = cameraPoseTracker->getRelativePose();
+//        if(did_update1 && did_update2) {
+//            StateHelper::marginalize_old_clone(state);
+//        }
+        relativePose rP = cameraPoseTracker->getRelativePose();
 //        double residual1 = updaterCameraTracking->updateImage2Image(state, rP, did_update1);
 //        Eigen::Matrix4d C1_T_Ck = cameraPoseTracker->getCameraPose().pose;
 //        double residual2 = updaterCameraTracking->updateImage2FirstImage(state, C1_T_Ck, G_T_I0, timestamp, did_update2);
-        double residual3 = updaterCameraTracking->updatePixelBased(state, G_T_I0, imagepoints, objectpoints_c0, timestamp, did_update3);
+        double residual3 = updaterCameraTracking->updatePixelBased(state, G_T_I0, imagepoints,
+                                                                   objectpoints_c0, timestamp, did_update3);
         if(did_update3) {
             return true;
         }
+//        if(did_update1 && did_update2) {
+//            return true;
+//        }
     }
     return false;
 }

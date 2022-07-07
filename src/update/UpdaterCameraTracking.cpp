@@ -53,7 +53,7 @@ double UpdaterCameraTracking::updateImage2Image(State *current_state, relativePo
     x_order.push_back(imuPose_j);
     total_hx += imuPose_j->size();
 
-    if(current_state->_options.do_calib_extrinsic) {
+    if(current_state->_options.do_calib_camera_imu_extrinsic) {
         /// Add the extrinsic calibration param
         x_order.push_back(calibration);
         total_hx += calibration->size();
@@ -76,7 +76,7 @@ double UpdaterCameraTracking::updateImage2Image(State *current_state, relativePo
 
     Eigen::MatrixXd H1_xc_rot = Eigen::MatrixXd::Zero(3, 3);
     Eigen::MatrixXd H1_xc_trans = Eigen::MatrixXd::Zero(3, 3);
-    if(current_state->_options.do_calib_extrinsic) {
+    if(current_state->_options.do_calib_camera_imu_extrinsic) {
         H1_xc_rot = I_R_C.transpose() * (Ii_R_G * Ij_R_G.transpose() - Eigen::MatrixXd::Identity(3, 3));
         H_x.block(0, 12, 3, 3) = H1_xc_rot;
         H_x.block(0, 15, 3, 3) = H1_xc_trans;
@@ -137,7 +137,7 @@ double UpdaterCameraTracking::updateImage2FirstImage(State *current_state, Eigen
     x_order.push_back(imuPose_k);
     total_hx += imuPose_k->size();
 
-    if(current_state->_options.do_calib_extrinsic) {
+    if(current_state->_options.do_calib_camera_imu_extrinsic) {
         /// Add the extrinsic calibration param
         x_order.push_back(calibration);
         total_hx += calibration->size();
@@ -163,7 +163,7 @@ double UpdaterCameraTracking::updateImage2FirstImage(State *current_state, Eigen
     H_x.block(0, 0, 3, 3) = H2_xk_rot;
     H_x.block(0, 3, 3, 3) = H2_xk_trans;
 
-    if(current_state->_options.do_calib_extrinsic) {
+    if(current_state->_options.do_calib_camera_imu_extrinsic) {
         H_x.block(0, 6, 3, 3) = H2_xc_rot;
         H_x.block(0, 9, 3, 3) = H2_xc_trans;
     }
@@ -227,7 +227,7 @@ double UpdaterCameraTracking::updatePixelBased(State *current_state, Eigen::Matr
     x_order.push_back(imuPose_k);
     total_hx += imuPose_k->size();
 
-    if(current_state->_options.do_calib_extrinsic) {
+    if(current_state->_options.do_calib_camera_imu_extrinsic) {
         /// Add the extrinsic calibration param
         x_order.push_back(calibration);
         total_hx += calibration->size();

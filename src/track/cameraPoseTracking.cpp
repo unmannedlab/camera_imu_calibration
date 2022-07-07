@@ -64,15 +64,17 @@ namespace camimucalib_core {
                                                             cv::Size(checkerboard_cols, checkerboard_rows),
                                                             image_points);
         image_points_undistorted.clear();
-        cv::undistortPoints(image_points, image_points_undistorted, projection_matrix, distCoeff);
-        imagepoints = image_points_undistorted;
-        cv::drawChessboardCorners(image_in_for_visualization, cv::Size(checkerboard_cols, checkerboard_rows),
-                                  image_points, boardDetectedInCam);
-        if(boardDetectedInCam) {
-            assert(image_points.size() == object_points.size());
-            estimateCameraPose();
-            objectpoints_C0.clear();
-            objectpoints_C0 = object_points_C0;
+        if(boardDetectedInCam){
+            cv::undistortPoints(image_points, image_points_undistorted, projection_matrix, distCoeff);
+            imagepoints = image_points_undistorted;
+            cv::drawChessboardCorners(image_in_for_visualization, cv::Size(checkerboard_cols, checkerboard_rows),
+                                      image_points, boardDetectedInCam);
+            if(boardDetectedInCam) {
+                assert(image_points.size() == object_points.size());
+                estimateCameraPose();
+                objectpoints_C0.clear();
+                objectpoints_C0 = object_points_C0;
+            }
         }
         return boardDetectedInCam;
     }
@@ -87,11 +89,11 @@ namespace camimucalib_core {
 
         double error = 0;
         for(int i = 0; i < projected_points.size(); i++){
-//            cv::circle(image_in_for_visualization, projected_points[i], 3, cv::Scalar(185, 185, 45), -1, cv::LINE_AA, 0);
             error += (projected_points[i].x - image_points[i].x)*(projected_points[i].x - image_points[i].x);
             error += (projected_points[i].y - image_points[i].y)*(projected_points[i].y - image_points[i].y);
             cv::arrowedLine(image_in_for_visualization, image_points[i], projected_points[i], cv::Scalar(185, 185, 45),
                  2, cv::LINE_4);
+            cv::circle(image_in_for_visualization, projected_points[i], 5, cv::Scalar(255, 0, 255), -1, cv::LINE_AA, 0);
         }
 
         error = sqrt(error/projected_points.size());
@@ -142,7 +144,8 @@ namespace camimucalib_core {
         first_frame = false;
     }
 
-    double cameraPoseTracking::checkReprojections(Eigen::Matrix4d I_T_C, Eigen::Matrix4d I0_T_Ik) {
+    double
+    cameraPoseTracking::checkReprojections(Eigen::Matrix4d I_T_C, Eigen::Matrix4d I0_T_Ik, int number_of_frames) {
         Eigen::Matrix4d b_T_c = I_T_C.inverse() * I0_T_Ik * I_T_C;
         Eigen::Matrix4d c_T_b = b_T_c.inverse();
         Eigen::Matrix3d c_R_b = c_T_b.block(0, 0, 3, 3);
@@ -163,7 +166,7 @@ namespace camimucalib_core {
                     CV_RGB(118, 185, 0), //font color
                     4);
         cv::putText(image_in_for_visualization, //target image
-                    "Cumulative Rep Error: " + std::to_string(cumulative_rep_err), //text
+                    "Average Rep Error: " + std::to_string(cumulative_rep_err/number_of_frames), //text
                     cv::Point(image_in_for_visualization.cols / 2-400, 160),
                     cv::FONT_HERSHEY_DUPLEX,
                     2.0,
